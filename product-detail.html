@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Product Detail | Parakeet Press</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+<body>
+	<header>
+		<img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" style="height:48px;vertical-align:middle;margin-right:12px;border-radius:12px;">
+		<a href="/" style="text-decoration:none;color:inherit;"><h1 style="display:inline;vertical-align:middle;">PARAKEET PRESS</h1></a>
+		<nav>
+			<a href="/">Home</a>
+			<a href="services.html">Services</a>
+			<a href="store.html">Store</a>
+		</nav>
+	</header>
+	<main>
+		<section id="product-detail" style="margin-top:2em;">
+			<h2>Product Detail</h2>
+			<div id="product-detail-card"></div>
+		</section>
+	</main>
+	<footer>
+		<p id="copyright"></p>
+		<script>
+		  document.addEventListener('DOMContentLoaded', function() {
+		    var year = new Date().getFullYear();
+		    var copyright = document.getElementById('copyright');
+		    if (copyright) {
+		      copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+		    }
+		  });
+		</script>
+	</footer>
+	<script>
+		// Robust CSV parser for quoted fields
+		function parseCSV(text) {
+			const lines = text.trim().split('\n');
+			const headers = lines[0].split(',');
+			return lines.slice(1).map(line => {
+				const values = [];
+				let current = '';
+				let inQuotes = false;
+				for (let i = 0; i < line.length; i++) {
+					const char = line[i];
+					if (char === '"') {
+						inQuotes = !inQuotes;
+					} else if (char === ',' && !inQuotes) {
+						values.push(current);
+						current = '';
+					} else {
+						current += char;
+					}
+				}
+				values.push(current);
+				const obj = {};
+				// Only map up to the number of headers, ignore extra fields, fill missing with ''
+				headers.forEach((h, i) => obj[h.trim()] = (i < values.length && values[i] !== undefined) ? values[i].trim() : '');
+				return obj;
+			});
+		}
+		function getTitle() {
+			const params = new URLSearchParams(window.location.search);
+			return params.get('title');
+		}
+		function renderProduct(p) {
+			let videoEmbed = '';
+			if (p.videoLink && p.videoLink.startsWith('http')) {
+				let vidId = '';
+				if (p.videoLink.includes('youtube.com')) {
+					const match = p.videoLink.match(/[?&]v=([^&]+)/);
+					vidId = match ? match[1] : '';
+				} else if (p.videoLink.includes('youtu.be/')) {
+					vidId = p.videoLink.split('youtu.be/')[1];
+				}
+				if (vidId) {
+					videoEmbed = `<iframe width="100%" height="220" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe>`;
+				}
+			}
+			// Fallbacks for blank fields
+			const title = p.title && p.title.trim() ? p.title : 'Untitled';
+			const instrumentation = p.instrumentation && p.instrumentation.trim() ? p.instrumentation : 'N/A';
+			const year = p.year && p.year.trim() ? p.year : 'N/A';
+			const duration = p.duration && p.duration.trim() ? p.duration : 'N/A';
+			return `
+				<div class="product-card">
+					<h3>${title}</h3>
+					<p><strong>Instrumentation:</strong> ${instrumentation}</p>
+					<p><strong>Year:</strong> ${year}</p>
+					<p><strong>Duration:</strong> ${duration} min</p>
+					${videoEmbed}
+					${p.buyLink && p.buyLink.trim() !== '' ? `<a class="buy-btn" href="${p.buyLink}" target="_blank">Buy Score</a>` : `<div class="not-available">Sorry! This score is not yet available, please contact Daniel at <a href='mailto:parakeetpress@gmail.com'>parakeetpress@gmail.com</a></div>`}
+				</div>
+			`;
+		}
+		const card = document.getElementById('product-detail-card');
+		function showError(msg) {
+			card.innerHTML = `<div class="not-available">${msg}</div>`;
+		}
+		fetch('pp_files/pp_store/scoresShop.csv')
+			.then(res => {
+				if (!res.ok) {
+					showError('Error loading product data.');
+					throw new Error('Network error');
+				}
+				return res.text();
+			})
+			.then(text => {
+				let products;
+				try {
+					products = parseCSV(text);
+				} catch (e) {
+					showError('Error parsing product data.');
+					throw e;
+				}
+				const rawTitle = getTitle();
+				if (!rawTitle) {
+					showError('No product specified.');
+					return;
+				}
+				const decodedTitle = decodeURIComponent(rawTitle).replace(/\+/g, ' ').trim().toLowerCase();
+				const p = products.find(prod => (prod.title || '').trim().toLowerCase() === decodedTitle);
+				if (!p) {
+					showError('Product not found.');
+					return;
+				}
+				try {
+					card.innerHTML = renderProduct(p);
+				} catch (e) {
+					showError('Error displaying product details.');
+				}
+			})
+			.catch(e => {
+				if (!card.innerHTML) showError('Unexpected error loading product.');
+			});
+				if (vidId) {
+					videoEmbed = `<iframe width="100%" height="220" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe>`;
+				}
+			}
+			return `
+				<div class="product-card">
+					<h3>${p.title}</h3>
+					<p><strong>Instrumentation:</strong> ${p.instrumentation}</p>
+					<p><strong>Year:</strong> ${p.year}</p>
+					<p><strong>Duration:</strong> ${p.duration} min</p>
+					${videoEmbed}
+					${p.buyLink && p.buyLink !== '' ? `<a class="buy-btn" href="${p.buyLink}" target="_blank">Buy Score</a>` : `<div class="not-available">Sorry! This score is not yet available, please contact Daniel at <a href='mailto:parakeetpress@gmail.com'>parakeetpress@gmail.com</a></div>`}
+				</div>
+			`;
+		}
+		fetch('pp_files/pp_store/scoresShop.csv')
+			.then(res => res.text())
+			.then(text => {
+				const products = parseCSV(text);
+				const rawTitle = getTitle();
+				const decodedTitle = rawTitle ? decodeURIComponent(rawTitle).replace(/\+/g, ' ').trim().toLowerCase() : '';
+				// Debug output: show searched title and all available titles
+				const debugInfo = document.createElement('pre');
+				debugInfo.style.background = '#fffbe6';
+				debugInfo.style.color = '#a00';
+				debugInfo.style.fontSize = '0.9em';
+				debugInfo.textContent = 'Searching for: ' + decodedTitle + '\nAvailable: ' + products.map(prod => (prod.title || '').trim().toLowerCase()).join(' | ');
+				document.getElementById('product-detail-card').appendChild(debugInfo);
+				// Robust match
+				const p = products.find(prod => (prod.title || '').trim().toLowerCase() === decodedTitle);
+				const card = document.getElementById('product-detail-card');
+				if (!p) {
+					card.innerHTML += '<div class="not-available">Product not found.</div>';
+					return;
+				}
+				card.innerHTML += renderProduct(p);
+			});
+	</script>
+</body>
+</html>

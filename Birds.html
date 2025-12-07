@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Parakeet Press | Birds</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .donate-container {
+      max-width: 480px;
+      margin: 3em auto;
+      background: rgba(251, 249, 242, 0.97);
+      border-radius: 18px;
+      box-shadow: 0 4px 16px rgba(120, 92, 82, 0.10);
+      border: 1.5px solid #785c52;
+      padding: 2.5em 2em;
+      text-align: center;
+    }
+    .donate-btn {
+      background: #ffdd00;
+      color: #222;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      padding: 1em 2em;
+      font-size: 1.2em;
+      margin-top: 2em;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(120,92,82,0.08);
+      transition: background 0.2s;
+    }
+    .donate-btn:hover {
+      background: #ffe866;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" style="height:48px;vertical-align:middle;margin-right:12px;border-radius:12px;">
+    <a href="/" style="text-decoration:none;color:inherit;"><h1 style="display:inline;vertical-align:middle;">PARAKEET PRESS</h1></a>
+    <div style="margin-bottom:8px;"></div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="services.html">Services</a>
+      <a href="store.html">Store</a>
+      <a href="Birds.html">Birds</a>
+    </nav>
+  </header>
+  <main>
+    <div class="donate-container">
+      <h2>Support Parakeet Press</h2>
+      <p>Love what we do? Help keep the music flying by buying us a coffee! Your donation helps support new music, resources, and the Parakeet Press community.</p>
+      <a href="https://buymeacoffee.com/dankim291" target="_blank" rel="noopener">
+        <button class="donate-btn">Donate via Buy Me a Coffee</button>
+      </a>
+    </div>
+  </main>
+  <footer>
+    <p id="copyright"></p>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var year = new Date().getFullYear();
+        var copyright = document.getElementById('copyright');
+        if (copyright) {
+          copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+        }
+      });
+    </script>
+  </footer>
+</body>
+</html>

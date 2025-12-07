@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Support Parakeet Press | Chirp!</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+        .birds-section {
+          max-width: 700px;
+          margin: 2.5em auto 2em auto;
+          text-align: center;
+          background: rgba(255, 245, 220, 0.45);
+          border-radius: 22px;
+          box-shadow: 0 2px 12px rgba(120,92,82,0.08);
+          padding: 2em 1em 1.5em 1em;
+        }
+        .birds-gallery {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 2em;
+          margin-top: 1em;
+        }
+        .bird-pic-frame {
+          background: #fffbe9;
+          border-radius: 18px;
+          box-shadow: 0 2px 8px rgba(120,92,82,0.10);
+          padding: 0.7em;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: auto;
+          transition: transform 0.15s;
+        }
+        .bird-pic-frame:hover {
+          transform: scale(1.04) rotate(-1deg);
+          box-shadow: 0 6px 18px rgba(120,92,82,0.16);
+        }
+        .bird-pic-frame img {
+          max-width: 180px;
+          max-height: 180px;
+          border-radius: 14px;
+          border: 2.5px solid #ffe066;
+          background: #fff;
+          margin-bottom: 0;
+          object-fit: contain;
+        }
+    .donate-container {
+      max-width: 480px;
+      margin: 3em auto;
+      background: rgba(251, 249, 242, 0.97);
+      border-radius: 18px;
+      box-shadow: 0 4px 16px rgba(120, 92, 82, 0.10);
+      border: 1.5px solid #785c52;
+      padding: 2.5em 2em;
+      text-align: center;
+    }
+    .donate-btn {
+      background: #ffdd00;
+      color: #222;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      padding: 1em 2em;
+      font-size: 1.2em;
+      margin-top: 2em;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(120,92,82,0.08);
+      transition: background 0.2s;
+    }
+    .donate-btn:hover {
+      background: #ffe866;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" style="height:48px;vertical-align:middle;margin-right:12px;border-radius:12px;">
+    <a href="/" style="text-decoration:none;color:inherit;"><h1 style="display:inline;vertical-align:middle;">PARAKEET PRESS</h1></a>
+    <div style="margin-bottom:8px;"></div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="services.html">Services</a>
+      <a href="store.html">Store</a>
+      <a href="chirp.html">Chirp!</a>
+    </nav>
+  </header>
+  <main>
+    <div class="donate-container">
+      <h2>Help Feed the Birds!</h2>
+      <p>If you enjoyed my music, services, or resources, please consider leaving a tip! Your support helps me create more music and share it with the community. Thank you for listening and supporting Parakeet Press!</p>
+      <a href="https://buymeacoffee.com/dankim291" target="_blank" rel="noopener">
+        <button class="donate-btn">Leave a Tip</button>
+      </a>
+    </div>
+    <div class="birds-section">
+      <div class="birds-gallery">
+        <div class="bird-pic-frame">
+          <img src="pp_files/PP_Birds1.jpg" alt="Bird 1">
+        </div>
+        <div class="bird-pic-frame">
+          <img src="pp_files/PP_Birds2.JPG" alt="Bird 2">
+        </div>
+        <div class="bird-pic-frame">
+          <img src="pp_files/PP_Birds3.jpg" alt="Bird 3">
+        </div>
+      </div>
+    </div>
+  </main>
+  <footer>
+    <p id="copyright"></p>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var year = new Date().getFullYear();
+        var copyright = document.getElementById('copyright');
+        if (copyright) {
+          copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+        }
+      });
+    </script>
+  </footer>
+</body>
+</html>

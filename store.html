@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store | Parakeet Press</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" style="height:48px;vertical-align:middle;margin-right:12px;border-radius:12px;">
+    <a href="/" style="text-decoration:none;color:inherit;"><h1 style="display:inline;vertical-align:middle;">PARAKEET PRESS</h1></a>
+    <div style="margin-bottom:8px;"></div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="services.html">Services</a>
+      <a href="store.html">Store</a>
+      <a href="chirp.html">Chirp!</a>
+    </nav>
+  </header>
+  <main>
+    <section id="store" style="margin-top:2em;">
+      <h2>Store</h2>
+      <div style="text-align:center;margin-bottom:1.5em;">
+        <input id="store-search" type="text" placeholder="Search by title, instrument, or year..." style="width:320px;max-width:90vw;padding:0.6em 1em;border-radius:10px;border:1.5px solid #785c52;font-size:1em;">
+      </div>
+      <div id="store-cards" class="store-cards"></div>
+    </section>
+  </main>
+  <footer>
+    <p id="copyright"></p>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var year = new Date().getFullYear();
+        var copyright = document.getElementById('copyright');
+        if (copyright) {
+          copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+        }
+      });
+    </script>
+  </footer>
+  <script>
+    // Robust CSV parser for quoted fields
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      const headers = lines[0].split(',');
+      return lines.slice(1).map(line => {
+        const values = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            inQuotes = !inQuotes;
+          } else if (char === ',' && !inQuotes) {
+            values.push(current);
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        values.push(current);
+        const obj = {};
+        headers.forEach((h, i) => obj[h.trim()] = values[i] ? values[i].trim() : '');
+        return obj;
+      });
+    }
+
+    let allProducts = [];
+    function renderStore(products) {
+      const container = document.getElementById('store-cards');
+      container.innerHTML = products.map((p) => `
+        <div class="product-card">
+          <div style="flex:1;min-width:0;">
+            <h3 style="margin-bottom:0.3em;">${p.title}</h3>
+            <div style="font-size:1em;color:#785c52;margin-bottom:0.1em;">${p.instrumentation} ${p.duration ? `(${p.duration} min.)` : ''}</div>
+          </div>
+          <div style="margin-left:auto;display:flex;align-items:center;">
+            <button class="info-btn" onclick="window.location.href='product-details.html?title=${encodeURIComponent(p.title)}'">
+              Buy${(() => {
+                if (p.price && p.price.trim()) {
+                  const num = parseFloat(p.price.replace(/[^\d.]/g, ''));
+                  return isFinite(num) && num > 0 ? ` for $${num.toFixed(2)}` : '';
+                }
+                return '';
+              })()}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    fetch('pp_files/pp_store/scoresShop.csv')
+      .then(res => res.text())
+      .then(text => {
+        allProducts = parseCSV(text);
+        // Sort by most recent year (descending)
+        allProducts = allProducts.sort((a, b) => {
+          const yearA = parseInt(a.year, 10) || 0;
+          const yearB = parseInt(b.year, 10) || 0;
+          return yearB - yearA;
+        });
+        renderStore(allProducts);
+      });
+
+    document.addEventListener('input', function(e) {
+      if (e.target && e.target.id === 'store-search') {
+        const q = e.target.value.trim().toLowerCase();
+        if (!q) {
+          renderStore(allProducts);
+          return;
+        }
+        const filtered = allProducts.filter(p =>
+          (p.title && p.title.toLowerCase().includes(q)) ||
+          (p.instrumentation && p.instrumentation.toLowerCase().includes(q)) ||
+          (p.year && p.year.toLowerCase().includes(q))
+        );
+        renderStore(filtered);
+      }
+    });
+  </script>
+</body>
+</html>
