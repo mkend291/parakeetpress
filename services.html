@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services | Parakeet Press</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" style="height:48px;vertical-align:middle;margin-right:12px;border-radius:12px;">
+    <a href="/" style="text-decoration:none;color:inherit;"><h1 style="display:inline;vertical-align:middle;">PARAKEET PRESS</h1></a>
+    <div style="margin-bottom:8px;"></div>
+    <nav>
+      <a href="/">Home</a>
+      <a href="services.html">Services</a>
+      <a href="store.html">Store</a>
+      <a href="chirp.html">Chirp!</a>
+    </nav>
+  </header>
+  <main>
+    <section id="services" style="margin-top:2em;">
+      <h2>Services & Requests</h2>
+      <div class="services-cards">
+        <div class="service-card">
+          <h3>Existing Composition</h3>
+          <p>Request scores and parts for works in my catalog. Browse my published compositions and arrangements to find pieces perfect for your ensemble or performance.</p>
+          <a href="store.html" class="request-btn" style="margin-top:1em;min-width:120px;text-align:center;display:inline-block;text-decoration:none;">Visit Store</a>
+        </div>
+        <div class="service-card">
+          <h3>Concert Composition</h3>
+          <p>Commission original concert works for ensembles, recitals, and any live performance occasion. I create pieces tailored to your specific instrumentation and artistic vision.</p>
+          <button class="request-btn" data-service="Concert Composition">Request</button>
+        </div>
+        <div class="service-card">
+          <h3>Media Composition</h3>
+          <p>Original music for multimedia, film, TV, games, documentaries, dance, and other collaborative projects. I specialize in creating evocative soundscapes that enhance your visual storytelling.</p>
+          <button class="request-btn" data-service="Media Composition">Request</button>
+        </div>
+        <div class="service-card">
+          <h3>Arrangement and Orchestration</h3>
+          <p>Get professional arrangements and orchestrations of your favorite pieces. I specialize in creating arrangements for various ensembles and instrumentations.</p>
+          <button class="request-btn" data-service="Arrangement and Orchestration">Request</button>
+        </div>
+        <div class="service-card">
+          <h3>Transcriptions and Score Preparation</h3>
+          <p>Professional music transcription and engraving services. I can notate music by ear and prepare publication-ready scores and parts with meticulous attention to detail.</p>
+          <button class="request-btn" data-service="Transcriptions and Score Preparation">Request</button>
+        </div>
+        <div class="service-card">
+          <h3>Composition Lessons</h3>
+          <p>Private composition lessons for all levels and ages. I offer instruction in composition, orchestration, music theory, and analysis.</p>
+          <button class="request-btn" data-service="Composition Lessons">Request</button>
+        </div>
+        <div class="service-card info-card">
+          <h3>Useful Information for Requests</h3>
+          <ul>
+            <li>Instrumentation</li>
+            <li>Duration</li>
+            <li>Turnaround Time</li>
+            <li>Budget</li>
+            <li>Deliverables (Score, Parts, Audio)</li>
+            <li>File Formats (pdf, mp3, wav, sib, mscz, midi, musicxml)</li>
+          </ul>
+        </div>
+        <div class="service-card info-card">
+          <h3>What You Can Expect</h3>
+          <ul>
+            <li>Quick turnaround (avg. 2-4 weeks)</li>
+            <li>Aesthetic Scores and Parts</li>
+            <li>Flexible Fees</li>
+            <li>Unlimited revisions</li>
+          </ul>
+        </div>
+        <div class="service-card">
+          <p>To request a service or discuss a project, please <a href="mailto:parakeetpress@gmail.com?subject=Service%20Request">email me</a> or use the contact options on the homepage.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="request-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn">&times;</span>
+      <h2>Service Request</h2>
+      <form id="request-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" readonly>
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" rows="5" required></textarea>
+        <button type="submit">Send Request</button>
+      </form>
+    </div>
+  </div>
+  <footer>
+    <p id="copyright"></p>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var year = new Date().getFullYear();
+        var copyright = document.getElementById('copyright');
+        if (copyright) {
+          copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+        }
+      });
+    </script>
+  </footer>
+<script>
+// Modal logic
+const modal = document.getElementById('request-modal');
+const closeBtn = document.querySelector('.close-btn');
+const requestBtns = document.querySelectorAll('.request-btn');
+const subjectInput = document.getElementById('subject');
+const form = document.getElementById('request-form');
+
+requestBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    modal.style.display = 'block';
+    subjectInput.value = btn.getAttribute('data-service');
+  });
+});
+closeBtn.onclick = function() {
+  modal.style.display = 'none';
+}
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = 'none';
+  }
+}
+form.onsubmit = function(e) {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const subject = document.getElementById('subject').value;
+  const message = document.getElementById('message').value;
+  window.location.href = `mailto:parakeetpress@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + message)}`;
+  modal.style.display = 'none';
+  form.reset();
+}
+</script>
+</body>
+</html>
