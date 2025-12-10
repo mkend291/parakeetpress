@@ -1,3 +1,15 @@
+.contact-btn.fiverr {
+  background: #1dbf73;
+  color: #fff;
+  border: none;
+}
+.contact-btn.fiverr .icon i {
+  color: #fff;
+}
+.contact-btn.fiverr:hover {
+  box-shadow: 0 4px 16px rgba(29,191,115,0.15);
+  filter: brightness(1.08);
+}
 /* Store Grid and Card Styles */
 .store-cards {
   display: flex;
@@ -70,6 +82,85 @@
   margin-top: 0;
   margin-bottom: 0.7em;
   font-size: 1.2em;
+}
+
+/* Contact Button Styles (dankimcomposer.com inspired) */
+.contact-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+  justify-content: center;
+  margin-top: 1.5em;
+}
+.contact-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  background: rgba(251, 249, 242, 0.85);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(120, 92, 82, 0.15);
+  border: 1.5px solid #785c52;
+  padding: 0.7em 1.5em;
+  font-size: 1.08em;
+  font-weight: 500;
+  color: #785c52;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+}
+.contact-btn .icon {
+  display: flex;
+  align-items: center;
+}
+.contact-btn.youtube {
+  background: #FF0000;
+  color: #fff;
+  border-color: #FF0000;
+}
+.contact-btn.youtube .icon svg {
+  fill: #fff;
+}
+.contact-btn.youtube:hover {
+  box-shadow: 0 4px 16px rgba(255,0,0,0.15);
+  filter: brightness(1.08);
+}
+.contact-btn.discord {
+  background: #5865F2;
+  color: #fff;
+  border-color: #5865F2;
+}
+.contact-btn.discord .icon svg {
+  fill: #fff;
+}
+.contact-btn.discord:hover {
+  box-shadow: 0 4px 16px rgba(88,101,242,0.15);
+  filter: brightness(1.08);
+}
+.contact-btn.instagram {
+  background: linear-gradient(90deg, #fd5949 0%, #e4405f 50%, #833ab4 100%);
+  color: #fff;
+  border: none;
+}
+.contact-btn.instagram .icon svg {
+  fill: #fff;
+}
+.contact-btn.instagram:hover {
+  box-shadow: 0 4px 16px rgba(228,64,95,0.15);
+  filter: brightness(1.08);
+}
+.contact-btn.email {
+  border-color: #785c52;
+}
+.contact-btn.email:hover {
+  background: #785c52;
+  color: #fff;
+}
+.contact-btn.phone {
+  border-color: #785c52;
+}
+.contact-btn.phone:hover {
+  background: #785c52;
+  color: #fff;
 }
 .buy-btn {
   margin-top: 1em;
