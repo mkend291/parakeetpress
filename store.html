@@ -69,14 +69,14 @@
     let allProducts = [];
     function renderStore(products) {
       const container = document.getElementById('store-cards');
-      container.innerHTML = products.map((p) => `
+      container.innerHTML = products.map((p, idx) => `
         <div class="product-card">
           <div style="flex:1;min-width:0;">
             <h3 style="margin-bottom:0.3em;">${p.title}</h3>
             <div style="font-size:1em;color:#785c52;margin-bottom:0.1em;">${p.instrumentation} ${p.duration ? `(${p.duration} min.)` : ''}</div>
           </div>
           <div style="margin-left:auto;display:flex;align-items:center;">
-            <button class="info-btn" onclick="window.location.href='product-details.html?title=${encodeURIComponent(p.title)}'">
+            <button class="info-btn" data-title="${encodeURIComponent(p.title)}">
               Buy${(() => {
                 if (p.price && p.price.trim()) {
                   const num = parseFloat(p.price.replace(/[^\d.]/g, ''));
@@ -116,6 +116,16 @@
           (p.year && p.year.toLowerCase().includes(q))
         );
         renderStore(filtered);
+      }
+    });
+
+    // Delegate click for info-btn to handle special characters safely
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.classList.contains('info-btn')) {
+        const encodedTitle = e.target.getAttribute('data-title');
+        if (encodedTitle) {
+          window.location.href = 'product-details.html?title=' + encodedTitle;
+        }
       }
     });
   </script>
