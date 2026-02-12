@@ -79,19 +79,30 @@
 					videoEmbed = `<iframe width="100%" height="220" src="https://www.youtube.com/embed/${vidId}" frameborder="0" allowfullscreen></iframe>`;
 				}
 			}
-			// Fallbacks for blank fields
-			const title = p.title && p.title.trim() ? p.title : 'Untitled';
-			const instrumentation = p.instrumentation && p.instrumentation.trim() ? p.instrumentation : 'N/A';
-			const year = p.year && p.year.trim() ? p.year : 'N/A';
-			const duration = p.duration && p.duration.trim() ? p.duration : 'N/A';
+			// Always show Contact Daniel button
+			const contactBtn = `<a class="buy-btn secondary-btn" href="mailto:dankimcomposer@gmail.com?subject=Score Purchase Inquiry: ${encodeURIComponent(title)}">Contact Daniel</a>`;
+			if (p.multipleParts && p.multipleParts.trim().toLowerCase() === 'false') {
+				if (p.buyLink && p.buyLink.trim() !== '') {
+					const btnText = p.buyMethod && p.buyMethod.trim() !== '' ? p.buyMethod : 'Buy Score';
+					purchaseButton = `<a class="buy-btn" href="${p.buyLink}" target="_blank">${btnText}</a> ` + contactBtn;
+				} else {
+					purchaseButton = contactBtn;
+				}
+			} else {
+				purchaseButton = contactBtn;
+					purchaseButton = `<div class="not-available">Sorry! This score is not yet available, please contact Daniel at <a href='mailto:parakeetpress@gmail.com'>parakeetpress@gmail.com</a></div>`;
+				}
+			} else {
+				purchaseButton = `<div class="not-available">Sorry! This score is not yet available, please contact Daniel at <a href='mailto:parakeetpress@gmail.com'>parakeetpress@gmail.com</a></div>`;
+			}
 			return `
 				<div class="product-card">
 					<h3>${title}</h3>
-					<p><strong>Instrumentation:</strong> ${instrumentation}</p>
+					<p><strong>Instrumentation:</strong> ${p.instrumentation && p.instrumentation.trim() ? p.instrumentation : 'N/A'}</p>
 					<p><strong>Year:</strong> ${year}</p>
 					<p><strong>Duration:</strong> ${duration} min</p>
 					${videoEmbed}
-					${p.buyLink && p.buyLink.trim() !== '' ? `<a class="buy-btn" href="${p.buyLink}" target="_blank">Buy Score</a>` : `<div class="not-available">Sorry! This score is not yet available, please contact Daniel at <a href='mailto:parakeetpress@gmail.com'>parakeetpress@gmail.com</a></div>`}
+					${purchaseButton}
 				</div>
 			`;
 		}

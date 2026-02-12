@@ -29,6 +29,7 @@
         border-radius: 8px;
         border: 1px solid #ccc;
         font-size: 1em;
+        font-family: inherit;
       }
       .modal-form button { margin-top: 1em; }
       .modal-close { float:right; font-size:1.2em; cursor:pointer; color:#785c52; }
@@ -80,6 +81,7 @@
   <header>
     <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" style="height:48px;vertical-align:middle;margin-right:12px;border-radius:12px;">
     <a href="index.html" style="text-decoration:none;color:inherit;"><h1 style="display:inline;vertical-align:middle;">PARAKEET PRESS</h1></a>
+    <div style="margin-bottom:8px;"></div>
     <nav>
       <a href="index.html">Home</a>
       <a href="services.html">Services</a>
@@ -150,26 +152,48 @@
         }
       }
       // Fallbacks for blank fields
-      const title = p.title && p.title.trim() ? p.title : 'Untitled';
-      const instrumentation = p.instrumentation && p.instrumentation.trim() ? p.instrumentation : 'N/A';
-      const year = p.year && p.year.trim() ? p.year : 'N/A';
-      const duration = p.duration && p.duration.trim() ? p.duration : 'N/A';
+      function hideIfNA(val) {
+        return val && val.trim().toLowerCase() !== 'n/a' ? val.trim() : '';
+      }
+      const title = hideIfNA(p.title) || 'Untitled';
+      const instrumentation = hideIfNA(p.instrumentation);
+      const year = hideIfNA(p.year);
+      const duration = hideIfNA(p.duration);
       let buyBtn = '';
       const btnText = (p.buyMethod && p.buyMethod.trim()) ? p.buyMethod : 'Buy Score';
-      if (p.buyLink && p.buyLink.trim() !== '') {
-        const link = p.buyLink.trim();
-        if (link.includes('@') && !link.startsWith('http')) {
-          // Email address: show popup form
-          buyBtn = `<button class="buy-btn" type="button" id="open-email-modal">${btnText}</button>`;
-        } else {
-          // Regular link
-          buyBtn = `<a class="buy-btn" href="${link}" target="_blank">${btnText}</a>`;
-        }
-      } else {
-        buyBtn = `<div class="not-available">Sorry! This score is not yet available, please contact Daniel at <a href='mailto:parakeetpress@gmail.com'>parakeetpress@gmail.com</a></div>`;
+      // Always show Contact Daniel button
+      buyBtn = `<button class="buy-btn secondary-btn" type="button" id="open-email-modal">Contact Daniel</button>`;
+      const buyLink = hideIfNA(p.buyLink);
+      const multiplePartsRaw = p.multipleParts ? p.multipleParts.trim() : '';
+      const isMultipleParts = multiplePartsRaw && multiplePartsRaw.toLowerCase() !== 'false' && multiplePartsRaw.toLowerCase() !== 'n/a';
+      let multiPartsBlock = '';
+      if (isMultipleParts) {
+        multiPartsBlock += `<div style="margin-bottom:0.5em;font-weight:bold;">Purchase from ${btnText}:</div>`;
+        const parts = multiplePartsRaw.split(',').map(s => s.trim()).filter(Boolean);
+        const links = buyLink ? buyLink.split(',').map(s => s.trim()) : [];
+        multiPartsBlock += '<div style="margin-bottom:1em;">';
+        parts.forEach((part, idx) => {
+          const partKey = part.replace(/\s+/g, '').toLowerCase();
+          let foundLink = '';
+          for (const link of links) {
+            if (link.replace(/\s+/g, '').toLowerCase().includes(partKey)) {
+              foundLink = link;
+              break;
+            }
+          }
+          if (foundLink) {
+            multiPartsBlock += `<span style="white-space:nowrap;display:inline-block;margin-right:1.2em;">` +
+              `<a href="${foundLink}" target="_blank" style="color:#785c52;text-decoration:underline;">${part}</a></span>`;
+          } else {
+            multiPartsBlock += `<span style="color:#aaa;white-space:nowrap;display:inline-block;margin-right:1.2em;">${part}</span>`;
+          }
+        });
+        multiPartsBlock += '</div>';
+      } else if (buyLink) {
+        buyBtn += ` <a class="buy-btn" href="${buyLink}" target="_blank">${btnText}</a>`;
       }
-      let price = 'Contact for price';
-      if (p.price && p.price.trim()) {
+      let price = '';
+      if (p.price && hideIfNA(p.price)) {
         // Try to extract a number from the price string
         const priceNum = parseFloat(p.price.replace(/[^\d.]/g, ''));
         if (!isNaN(priceNum)) {
@@ -178,23 +202,29 @@
           price = p.price.trim();
         }
       }
-      const priceNotes = p.priceNotes && p.priceNotes.trim() ? `<div style='margin:0.2em 0 0.7em 0;font-style:italic;color:#555;'>${p.priceNotes}</div>` : '';
+      const priceNotes = p.priceNotes && hideIfNA(p.priceNotes) ? `<div style='margin:0.2em 0 0.7em 0;font-style:italic;color:#555;'>${p.priceNotes}</div>` : '';
       return `
         <div class="product-detail-full">
           <h2 style="margin-top:0;">${title}</h2>
-          <p><strong>Instrumentation:</strong> ${instrumentation}</p>
-          <p><strong>Duration:</strong> ${duration} min</p>
-          <p><strong>Year:</strong> ${year}</p>
-          <div style="margin:1.2em 0 0.2em 0;font-weight:bold;">Price: <span style='font-weight:normal;'>${price}</span></div>
+          ${instrumentation ? `<p><strong>Instrumentation:</strong> ${instrumentation}</p>` : ''}
+          ${duration ? `<p><strong>Duration:</strong> ${duration} min</p>` : ''}
+          ${year ? `<p><strong>Year:</strong> ${year}</p>` : ''}
+          ${price ? `<div style="margin:1.2em 0 0.2em 0;font-weight:bold;">Price: <span style='font-weight:normal;'>${price}</span></div>` : ''}
           ${priceNotes}
           <div style="margin:0.5em 0 0.5em 0;font-weight:bold;">Purchase Options:</div>
+          ${multiPartsBlock}
+          ${isMultipleParts ? '<div style="margin:0.5em 0 0.5em 3.5em;font-weight:bold;">or</div>' : ''}
           ${buyBtn}
+          <div style="margin-top:0.7em;font-size:0.98em;color:#785c52;background:rgba(251,249,242,0.7);border-radius:8px;padding:0.7em 1em 0.7em 1em;max-width:480px;">
+            <span style="font-weight:bold;">Save up to 30% by purchasing directly from Daniel.</span> Vendors take a significant cut, so buying direct saves you from paying extra while also allowing me to receive more of your support.
+          </div>
           ${videoEmbed}
         </div>
         <div class="modal-bg" id="email-modal">
           <form class="modal-form" id="email-form" onsubmit="return false;">
             <span class="modal-close" id="close-email-modal">&times;</span>
             <h3>Contact to Buy Score</h3>
+            <div style="margin-bottom:0.7em;font-size:0.98em;color:#785c52;"><strong>To:</strong> dankimcomposer@gmail.com</div>
             <label for="yourName">Your Name</label>
             <input type="text" id="yourName" name="yourName" required>
             <label for="yourEmail">Your Email</label>
@@ -202,7 +232,7 @@
             <label for="yourSubject">Subject</label>
             <input type="text" id="yourSubject" name="yourSubject" value="Score Purchase Inquiry: ${title}" required>
             <label for="yourMsg">Message</label>
-            <textarea id="yourMsg" name="yourMsg" rows="4">Hello,\n\nI am interested in purchasing the score for \"${title}\" (${instrumentation}, ${duration} min, ${year}).\n\nThank you!</textarea>
+            <textarea id="yourMsg" name="yourMsg" rows="4">Hello,\n\nI am interested in purchasing the score for \"${title}\".\n\nThank you!</textarea>
             <button type="submit" class="buy-btn">Send Email</button>
           </form>
         </div>
@@ -221,25 +251,11 @@
             const name = document.getElementById('yourName').value;
             const email = document.getElementById('yourEmail').value;
             let msg = document.getElementById('yourMsg').value;
-            const mailto = document.querySelector('.buy-btn[type="button"]').getAttribute('data-mailto') || '';
-            // Compose mailto link
-            const to = document.querySelector('.buy-btn[type="button"]').getAttribute('data-to') || '';
             const subject = encodeURIComponent(`Score Purchase Inquiry: ${document.querySelector('.product-detail-full h2').textContent}`);
-            // Add name/email to message
             msg = `Name: ${name}\nEmail: ${email}\n\n${msg}`;
             const body = encodeURIComponent(msg);
-            // Find the email address from the buyLink
-            let emailAddr = '';
-            const btn = document.getElementById('open-email-modal');
-            if (btn) {
-              // Try to extract from the product data
-              const products = window._lastProducts || [];
-              const rawTitle = getTitle();
-              const decodedTitle = rawTitle ? decodeURIComponent(rawTitle).replace(/\+/g, ' ').trim().toLowerCase() : '';
-              const p = products.find(prod => (prod.title || '').trim().toLowerCase() === decodedTitle);
-              if (p && p.buyLink) emailAddr = p.buyLink.trim();
-            }
-            if (!emailAddr) emailAddr = 'parakeetpress@gmail.com';
+            // Always send to dankimcomposer@gmail.com
+            const emailAddr = 'dankimcomposer@gmail.com';
             window.location.href = `mailto:${emailAddr}?subject=${subject}&body=${body}`;
             document.getElementById('email-modal').classList.remove('active');
           }
@@ -297,19 +313,11 @@
                 const email = document.getElementById('yourEmail').value;
                 const subjectRaw = document.getElementById('yourSubject').value;
                 let msg = document.getElementById('yourMsg').value;
-                // Compose message with name/email at the top
                 msg = `Name: ${name}\nEmail: ${email}\n\n${msg}`;
-                // Encode subject and body for mailto
                 const subject = encodeURIComponent(subjectRaw);
                 const body = encodeURIComponent(msg);
-                // Find the email address from the buyLink
-                let emailAddr = '';
-                const products = window._lastProducts || [];
-                const rawTitle = getTitle();
-                const decodedTitle = rawTitle ? decodeURIComponent(rawTitle).replace(/\+/g, ' ').trim().toLowerCase() : '';
-                const p = products.find(prod => (prod.title || '').trim().toLowerCase() === decodedTitle);
-                if (p && p.buyLink) emailAddr = p.buyLink.trim();
-                if (!emailAddr) emailAddr = 'parakeetpress@gmail.com';
+                // Always send to dankimcomposer@gmail.com
+                const emailAddr = 'dankimcomposer@gmail.com';
                 window.location.href = `mailto:${emailAddr}?subject=${subject}&body=${body}`;
                 modal.classList.remove('active');
                 return false;
