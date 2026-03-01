@@ -77,6 +77,64 @@
         </div>
       </div>
     </section>
+    <!-- Get a Quote Section -->
+    <section class="services-cards" style="margin-top:2.5em;display:flex;flex-direction:column;align-items:center;">
+      <div style="background:rgba(251,249,242,0.97);border-radius:14px;box-shadow:0 2px 12px rgba(120,92,82,0.10);padding:2.2em 2em 2em 2em;max-width:520px;width:100%;margin-bottom:2.5em;border:1.5px solid #785c52;">
+        <h2 style="margin-top:0;margin-bottom:0.7em;text-align:center;letter-spacing:0.5px;color:#785c52;">Get a Quote</h2>
+        <div style="display:flex;gap:1.2em;justify-content:center;align-items:end;margin-bottom:1.2em;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <label for="quote-length" style="font-weight:500;margin-bottom:0.3em;color:#785c52;">Length (minutes)</label>
+            <input type="number" id="quote-length" min="1" step="1" value="1" style="width:80px;padding:0.3em 0.5em;border-radius:6px;border:1px solid #785c52;text-align:center;background:#fff;color:#785c52;">
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;">
+            <label for="quote-instruments" style="font-weight:500;margin-bottom:0.3em;color:#785c52;">Instruments</label>
+            <select id="quote-instruments" style="width:140px;padding:0.3em 0.5em;border-radius:6px;border:1px solid #785c52;background:#fff;color:#785c52;text-align:center;">
+              <option value="1">Solo (1)</option>
+              <option value="2">Duet (2)</option>
+              <option value="3">Trio (3)</option>
+              <option value="4">Quartet (4)</option>
+              <option value="16">Orchestra Singles (16)</option>
+              <option value="28">Orchestra Doubles (28)</option>
+              <option value="35">Orchestra Triples (35)</option>
+              <option value="40">Orchestra Quadruples (40)</option>
+              <option value="custom">Custom</option>
+            </select>
+            <input type="number" id="custom-instruments" min="1" step="1" value="5" style="width:80px;padding:0.3em 0.5em;border-radius:6px;border:1px solid #785c52;text-align:center;background:#fff;color:#785c52;margin-top:0.5em;display:none;" placeholder="Custom #">
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;min-width:120px;">
+            <label for="discount-slider" style="font-weight:500;margin-bottom:0.3em;color:#785c52;">Discount (%)</label>
+            <div style="display:flex;align-items:center;gap:0.5em;">
+              <input type="range" id="discount-slider" min="0" max="75" step="5" value="0" style="width:90px;">
+              <span id="discount-value" style="color:#785c52;font-weight:bold;width:2.5em;display:inline-block;text-align:right;">0%</span>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:0.7em;font-weight:bold;font-size:1.15em;text-align:center;background:#fff;border-radius:7px;padding:0.7em 0;color:#785c52;">
+          Estimated Fee: <span id="quote-result"><span style="color:#785c52;">$4.57</span></span>
+        </div>
+        <div style="font-size:0.88em;color:#785c52;text-align:center;margin-top:1.1em;font-style:italic;">
+          Note 1: This is only an estimate. All fees are negotiable and subject to project details.
+        </div>
+        <div id="note2-dynamic" style="font-size:0.88em;color:#785c52;margin-top:0.7em;text-align:center;font-style:italic;">
+          Note 2: The following rates are from the American Federation of Musicians' Ultra-Low Budget MP rate for 2025.
+        </div>
+      </div>
+      <div style="background:rgba(251,249,242,0.97);border-radius:12px;box-shadow:0 1px 8px rgba(120,92,82,0.08);padding:1.5em 1em 1.7em 1em;max-width:650px;width:100%;border:1.5px solid #785c52;">
+        <h3 style="margin-top:0;margin-bottom:1em;text-align:center;letter-spacing:0.2px;color:#785c52;">Standard Ensembles Rates</h3>
+        <table style="border-collapse:collapse;width:100%;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(120,92,82,0.07);color:#785c52;">
+          <thead>
+            <tr style="background:#f3e8de;">
+              <th style="border:1px solid #785c52;padding:8px 12px;font-weight:600;color:#785c52;">Description</th>
+              <th style="border:1px solid #785c52;padding:8px 12px;font-weight:600;color:#785c52;">Lines</th>
+              <th style="border:1px solid #785c52;padding:8px 12px;font-weight:600;color:#785c52;">Cost per Minute</th>
+            </tr>
+          </thead>
+          <tbody id="ensemble-table-body">
+            <!-- JS will fill this -->
+          </tbody>
+        </table>
+      </div>
+    </section>
   </main>
   <div id="request-modal" class="modal">
     <div class="modal-content">
@@ -138,6 +196,90 @@ form.onsubmit = function(e) {
   window.location.href = `mailto:dankimcomposer@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + message)}`;
   modal.style.display = 'none';
   form.reset();
+}
+
+// --- Get a Quote Calculator ---
+let discountPercent = 0;
+function calculateQuote(instruments, length, useDiscount = true) {
+  const basePercent = 0.50;
+  let percent = basePercent;
+  if (useDiscount) {
+    percent = basePercent * (1 - discountPercent);
+  }
+  const fee = ((0.9147 * instruments + 14.934) * percent) * length;
+  return Math.round(fee * 100) / 100;
+}
+
+function updateQuote() {
+  let instruments;
+  const select = document.getElementById('quote-instruments');
+  if (select.value === 'custom') {
+    instruments = parseInt(document.getElementById('custom-instruments').value) || 1;
+  } else {
+    instruments = parseInt(select.value) || 1;
+  }
+  const length = parseInt(document.getElementById('quote-length').value) || 1;
+  let result = calculateQuote(instruments, length, true);
+  if (discountPercent > 0) {
+    let original = calculateQuote(instruments, length, false);
+    document.getElementById('quote-result').innerHTML = `<span style="text-decoration:line-through;color:#b33;font-weight:normal;">$${original.toFixed(2)}</span> <span style="color:#785c52;font-weight:bold;">$${result.toFixed(2)}</span>`;
+  } else {
+    document.getElementById('quote-result').innerHTML = `<span style="color:#785c52;font-weight:bold;">$${result.toFixed(2)}</span>`;
+  }
+  fillEnsembleTable();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  const quoteInstruments = document.getElementById('quote-instruments');
+  if (quoteInstruments) {
+    quoteInstruments.addEventListener('change', function() {
+      const select = document.getElementById('quote-instruments');
+      const customInput = document.getElementById('custom-instruments');
+      if (select.value === 'custom') {
+        customInput.style.display = '';
+      } else {
+        customInput.style.display = 'none';
+      }
+      updateQuote();
+    });
+    document.getElementById('custom-instruments').addEventListener('input', updateQuote);
+    document.getElementById('quote-length').addEventListener('input', updateQuote);
+    document.getElementById('discount-slider').addEventListener('input', function() {
+      discountPercent = parseInt(this.value) / 100;
+      document.getElementById('discount-value').textContent = this.value + '%';
+      updateQuote();
+    });
+    document.getElementById('discount-value').textContent = document.getElementById('discount-slider').value + '%';
+    fillEnsembleTable();
+  }
+});
+
+// --- Standard Ensembles Table ---
+const ensembles = [
+  { desc: 'Solo', lines: 1 },
+  { desc: 'Duet', lines: 2 },
+  { desc: 'Trio', lines: 3 },
+  { desc: 'Quartet', lines: 4 },
+  { desc: 'Orchestra Singles', lines: 16 },
+  { desc: 'Orchestra Doubles', lines: 28 },
+  { desc: 'Orchestra Triples', lines: 35 },
+  { desc: 'Orchestra Quadruples', lines: 40 }
+];
+function fillEnsembleTable() {
+  const tbody = document.getElementById('ensemble-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  ensembles.forEach(e => {
+    const original = calculateQuote(e.lines, 1, false);
+    const discounted = calculateQuote(e.lines, 1, true);
+    let costCell = `$${original.toFixed(2)}`;
+    if (discountPercent > 0) {
+      costCell = `<span style=\"text-decoration:line-through;color:#b33;font-weight:normal;\">$${original.toFixed(2)}</span> <span style=\"color:#785c52;font-weight:bold;\">$${discounted.toFixed(2)}</span>`;
+    }
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style=\"border:1px solid #785c52;padding:6px 10px;\">${e.desc}</td><td style=\"border:1px solid #785c52;padding:6px 10px;\">${e.lines}</td><td style=\"border:1px solid #785c52;padding:6px 10px;\">${costCell}</td>`;
+    tbody.appendChild(tr);
+  });
 }
 </script>
 </body>
