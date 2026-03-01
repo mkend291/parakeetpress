@@ -71,21 +71,17 @@
       const container = document.getElementById('store-cards');
       container.innerHTML = products.map((p, idx) => `
         <div class="product-card">
-          <div style="flex:1;min-width:0;">
-            <h3 style="margin-bottom:0.3em;">${p.title}</h3>
-            <div style="font-size:1em;color:#785c52;margin-bottom:0.1em;">${p.instrumentation} ${p.duration ? `(${p.duration} min.)` : ''}</div>
-          </div>
-          <div style="margin-left:auto;display:flex;align-items:center;">
-            <button class="info-btn" data-title="${encodeURIComponent(p.title)}">
-              Buy${(() => {
-                if (p.price && p.price.trim()) {
-                  const num = parseFloat(p.price.replace(/[^\d.]/g, ''));
-                  return isFinite(num) && num > 0 ? ` for $${num.toFixed(2)}` : '';
-                }
-                return '';
-              })()}
-            </button>
-          </div>
+          <h3 style="margin-bottom:0.3em;font-size:1.08em;">${p.title}</h3>
+          <div style="font-size:0.98em;color:#785c52;margin-bottom:0.1em;">${p.instrumentation} ${p.duration ? `(${p.duration} min.)` : ''}</div>
+          <button class="info-btn" data-title="${encodeURIComponent(p.title)}" style="margin-top:auto;width:100%;font-size:0.98em;">
+            Buy${(() => {
+              if (p.price && p.price.trim()) {
+                const num = parseFloat(p.price.replace(/[^\d.]/g, ''));
+                return isFinite(num) && num > 0 ? ` for $${num.toFixed(2)}` : '';
+              }
+              return '';
+            })()}
+          </button>
         </div>
       `).join('');
     }

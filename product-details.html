@@ -91,6 +91,7 @@
   </header>
   <main>
     <section id="product-detail" style="margin-top:2em;">
+      <a href="store.html" class="buy-btn" style="display:inline-block;margin-bottom:1.2em;padding:0.5em 1.5em;font-size:1em;">&larr; Back to Store</a>
       <h2>Product Details</h2>
       <div id="product-detail-card"></div>
     </section>
@@ -165,30 +166,41 @@
       buyBtn = `<button class="buy-btn secondary-btn" type="button" id="open-email-modal">Contact Daniel</button>`;
       const buyLink = hideIfNA(p.buyLink);
       const multiplePartsRaw = p.multipleParts ? p.multipleParts.trim() : '';
-      const isMultipleParts = multiplePartsRaw && multiplePartsRaw.toLowerCase() !== 'false' && multiplePartsRaw.toLowerCase() !== 'n/a';
       let multiPartsBlock = '';
-      if (isMultipleParts) {
-        multiPartsBlock += `<div style="margin-bottom:0.5em;font-weight:bold;">Purchase from ${btnText}:</div>`;
-        const parts = multiplePartsRaw.split(',').map(s => s.trim()).filter(Boolean);
-        const links = buyLink ? buyLink.split(',').map(s => s.trim()) : [];
-        multiPartsBlock += '<div style="margin-bottom:1em;">';
-        parts.forEach((part, idx) => {
-          const partKey = part.replace(/\s+/g, '').toLowerCase();
-          let foundLink = '';
-          for (const link of links) {
-            if (link.replace(/\s+/g, '').toLowerCase().includes(partKey)) {
-              foundLink = link;
-              break;
-            }
-          }
-          if (foundLink) {
-            multiPartsBlock += `<span style="white-space:nowrap;display:inline-block;margin-right:1.2em;">` +
-              `<a href="${foundLink}" target="_blank" style="color:#785c52;text-decoration:underline;">${part}</a></span>`;
-          } else {
-            multiPartsBlock += `<span style="color:#aaa;white-space:nowrap;display:inline-block;margin-right:1.2em;">${part}</span>`;
-          }
-        });
-        multiPartsBlock += '</div>';
+      let isMultiplePartsCSV = multiplePartsRaw && multiplePartsRaw.match(/\.csv$/i);
+      let isMultipleParts = !!isMultiplePartsCSV;
+      if (isMultiplePartsCSV) {
+        // Show loading message, then fetch and parse CSV
+        multiPartsBlock = `<div id="multi-parts-block" style="margin-bottom:1em;">Loading instrument purchase links...</div>`;
+        setTimeout(() => {
+          fetch('pp_files/pp_store/solo-arr-catalogue.csv')
+            .then(res => res.text())
+            .then(csvText => {
+              const rows = parseCSV(csvText);
+              const row = rows.find(r => (r.Title || r.title || '').trim().toLowerCase() === title.trim().toLowerCase());
+              if (!row) {
+                document.getElementById('multi-parts-block').innerHTML = '<span style="color:#a00;">No instrument links found for this title.</span>';
+                return;
+              }
+              let html = `<div style=\"margin-bottom:0.5em;font-weight:bold;\">Purchase Links by Instrument:</div><div style=\"margin-bottom:1em;\">`;
+              Object.keys(row).forEach(col => {
+                if (col.toLowerCase() === 'title') return;
+                const val = row[col];
+                if (val && val.trim().toLowerCase() !== 'n/a') {
+                  if (/^https?:\/\//.test(val)) {
+                    html += `<span style=\"white-space:nowrap;display:inline-block;margin-right:1.2em;\"><a href=\"${val}\" target=\"_blank\" class=\"buy-btn\" style=\"padding:0.4em 1em;margin:0 0.2em 0.5em 0;display:inline-block;\">${col}</a></span>`;
+                  } else {
+                    html += `<span style=\"color:#785c52;background:#eee;border-radius:8px;padding:0.4em 1em;margin:0 0.2em 0.5em 0;display:inline-block;opacity:0.7;cursor:not-allowed;\">${col}</span>`;
+                  }
+                }
+              });
+              html += '</div>';
+              document.getElementById('multi-parts-block').innerHTML = html;
+            })
+            .catch(() => {
+              document.getElementById('multi-parts-block').innerHTML = '<span style="color:#a00;">Error loading instrument links.</span>';
+            });
+        }, 0);
       } else if (buyLink) {
         buyBtn += ` <a class="buy-btn" href="${buyLink}" target="_blank">${btnText}</a>`;
       }
