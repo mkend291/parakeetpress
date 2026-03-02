@@ -138,30 +138,12 @@
       return params.get('title');
     }
     function renderProduct(p) {
-            // Dynamically generated list of cover images
-            const coverImgs = [
-              "Amazing Grace.jpg",
-              "Aura Lee.jpg",
-              "Eternal Source of Light Divine (Handel).jpg",
-              "Greensleeves.jpeg",
-              "Lullaby (Brahms).jpg",
-              "Morning Prayer (Tchaikovsky).jpg",
-              "Never Coming Back (Duet).jpg",
-              "Ode to Joy (Beethoven).jpg",
-              "Paraphrase on Rhapsody in Blue.jpeg",
-              "Sarabande (Handel).jpg",
-              "Scarborough Fair.jpeg",
-              "Simple Gifts.jpg",
-              "Six Selections from Kinderszenen (Schumann).jpg"
-            ];
-            // Try to find a matching cover image (jpg or jpeg)
+            // Dynamically generate possible cover image filenames
             const safeTitle = (p.title || '').trim();
-            let imgFile = coverImgs.find(f => f.toLowerCase() === safeTitle.toLowerCase() + '.jpg') ||
-                          coverImgs.find(f => f.toLowerCase() === safeTitle.toLowerCase() + '.jpeg');
-            let imgTag = '';
-            if (imgFile) {
-              imgTag = `<img src="pp_files/pp_store/pp_cover-imgs/${imgFile}" alt="${safeTitle} cover" class="cover-img-full" style="display:block;margin:0.5em auto 1.2em auto;">`;
-            }
+            const imgJpg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpg`;
+            const imgJpeg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpeg`;
+            // Try .jpg first, then .jpeg if .jpg fails
+            let imgTag = `<img src="${imgJpg}" alt="${safeTitle} cover" class="cover-img-full" style="display:block;margin:0.5em auto 1.2em auto;" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.style.display='none';}">`;
       let videoEmbed = '';
       if (p.videoLink && p.videoLink.startsWith('http')) {
         let vidId = '';
