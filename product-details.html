@@ -92,7 +92,6 @@
   <main>
     <section id="product-detail" style="margin-top:2em;">
       <a href="store.html" class="buy-btn" style="display:inline-block;margin-bottom:1.2em;padding:0.5em 1.5em;font-size:1em;">&larr; Back to Store</a>
-      <h2>Product Details</h2>
       <div id="product-detail-card"></div>
     </section>
   </main>
@@ -139,6 +138,30 @@
       return params.get('title');
     }
     function renderProduct(p) {
+            // Dynamically generated list of cover images
+            const coverImgs = [
+              "Amazing Grace.jpg",
+              "Aura Lee.jpg",
+              "Eternal Source of Light Divine (Handel).jpg",
+              "Greensleeves.jpeg",
+              "Lullaby (Brahms).jpg",
+              "Morning Prayer (Tchaikovsky).jpg",
+              "Never Coming Back (Duet).jpg",
+              "Ode to Joy (Beethoven).jpg",
+              "Paraphrase on Rhapsody in Blue.jpeg",
+              "Sarabande (Handel).jpg",
+              "Scarborough Fair.jpeg",
+              "Simple Gifts.jpg",
+              "Six Selections from Kinderszenen (Schumann).jpg"
+            ];
+            // Try to find a matching cover image (jpg or jpeg)
+            const safeTitle = (p.title || '').trim();
+            let imgFile = coverImgs.find(f => f.toLowerCase() === safeTitle.toLowerCase() + '.jpg') ||
+                          coverImgs.find(f => f.toLowerCase() === safeTitle.toLowerCase() + '.jpeg');
+            let imgTag = '';
+            if (imgFile) {
+              imgTag = `<img src="pp_files/pp_store/pp_cover-imgs/${imgFile}" alt="${safeTitle} cover" class="cover-img-full" style="display:block;margin:0.5em auto 1.2em auto;">`;
+            }
       let videoEmbed = '';
       if (p.videoLink && p.videoLink.startsWith('http')) {
         let vidId = '';
@@ -160,6 +183,7 @@
       const instrumentation = hideIfNA(p.instrumentation);
       const year = hideIfNA(p.year);
       const duration = hideIfNA(p.duration);
+      const info = hideIfNA(p.info);
       let buyBtn = '';
       const btnText = (p.buyMethod && p.buyMethod.trim()) ? p.buyMethod : 'Buy Score';
       // Always show Contact Daniel button
@@ -218,9 +242,11 @@
       return `
         <div class="product-detail-full">
           <h2 style="margin-top:0;">${title}</h2>
+          ${imgTag}
           ${instrumentation ? `<p><strong>Instrumentation:</strong> ${instrumentation}</p>` : ''}
           ${duration ? `<p><strong>Duration:</strong> ${duration} min</p>` : ''}
           ${year ? `<p><strong>Year:</strong> ${year}</p>` : ''}
+            ${info ? `<p><strong>Info:</strong> ${info}</p>` : ''}
           ${price ? `<div style="margin:1.2em 0 0.2em 0;font-weight:bold;">Price: <span style='font-weight:normal;'>${price}</span></div>` : ''}
           ${priceNotes}
           <div style="margin:0.5em 0 0.5em 0;font-weight:bold;">Purchase Options:</div>
@@ -249,6 +275,31 @@
           </form>
         </div>
       `;
+            // Cover image modal logic
+            setTimeout(function() {
+              var img = document.getElementById('cover-img-half');
+              var modal = document.getElementById('cover-modal');
+              var modalInner = document.getElementById('cover-modal-inner');
+              var modalImg = document.getElementById('cover-modal-img');
+              if (img && modal && modalImg) {
+                img.onclick = function() {
+                  modalImg.src = img.src;
+                  modalImg.alt = img.alt;
+                  modal.style.display = 'block';
+                };
+                img.onkeydown = function(e) {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    img.onclick();
+                  }
+                };
+                // Close modal when clicking outside the image
+                modal.onclick = function(e) {
+                  if (e.target === modal || e.target === modalInner) {
+                    modal.style.display = 'none';
+                  }
+                };
+              }
+            }, 0);
         // Email modal logic
         document.addEventListener('click', function(e) {
           if (e.target && e.target.id === 'open-email-modal') {

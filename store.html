@@ -69,33 +69,57 @@
     let allProducts = [];
     function renderStore(products) {
       const container = document.getElementById('store-cards');
-      container.innerHTML = products.map((p, idx) => `
-        <div class="product-card">
-          <h3 style="margin-bottom:0.3em;font-size:1.08em;">${p.title}</h3>
-          <div style="font-size:0.98em;color:#785c52;margin-bottom:0.1em;">${p.instrumentation} ${p.duration ? `(${p.duration} min.)` : ''}</div>
-          <button class="info-btn" data-title="${encodeURIComponent(p.title)}" style="margin-top:auto;width:100%;font-size:0.98em;">
-            Buy${(() => {
-              if (p.price && p.price.trim()) {
-                const num = parseFloat(p.price.replace(/[^\d.]/g, ''));
-                return isFinite(num) && num > 0 ? ` for $${num.toFixed(2)}` : '';
-              }
-              return '';
-            })()}
-          </button>
-        </div>
-      `).join('');
+      // Dynamically generated list of cover images
+      const coverImgs = [
+        "Amazing Grace.jpg",
+        "Aura Lee.jpg",
+        "Eternal Source of Light Divine (Handel).jpg",
+        "Greensleeves.jpeg",
+        "Lullaby (Brahms).jpg",
+        "Morning Prayer (Tchaikovsky).jpg",
+        "Never Coming Back (Duet).jpg",
+        "Ode to Joy (Beethoven).jpg",
+        "Paraphrase on Rhapsody in Blue.jpeg",
+        "Sarabande (Handel).jpg",
+        "Scarborough Fair.jpeg",
+        "Simple Gifts.jpg",
+        "Six Selections from Kinderszenen (Schumann).jpg"
+      ];
+      container.innerHTML = products.map((p, idx) => {
+        // Try to find a matching cover image (jpg or jpeg)
+        const safeTitle = (p.title || '').trim();
+        let imgFile = coverImgs.find(f => f.toLowerCase() === safeTitle.toLowerCase() + '.jpg') ||
+                      coverImgs.find(f => f.toLowerCase() === safeTitle.toLowerCase() + '.jpeg');
+        let imgTag = '';
+        if (imgFile) {
+          imgTag = `<img src="pp_files/pp_store/pp_cover-imgs/${imgFile}" alt="${safeTitle} cover" class="cover-img">`;
+        }
+        const detailUrl = 'product-details.html?title=' + encodeURIComponent(p.title);
+        return `
+          <div class="product-card" data-title="${encodeURIComponent(p.title)}" tabindex="0" style="cursor:pointer;">
+            ${imgTag}
+            <h3 style="margin-bottom:0.3em;font-size:1.08em;">${p.title}</h3>
+            <div style="font-size:0.98em;color:#785c52;margin-bottom:0.1em;">${p.instrumentation} ${p.duration ? `(${p.duration} min.)` : ''}</div>
+            <button class="info-btn" data-title="${encodeURIComponent(p.title)}" style="margin-top:auto;width:100%;font-size:0.98em;" tabindex="-1">
+              Buy${(() => {
+                if (p.price && p.price.trim()) {
+                  const num = parseFloat(p.price.replace(/[^\d.]/g, ''));
+                  return isFinite(num) && num > 0 ? ` for $${num.toFixed(2)}` : '';
+                }
+                return '';
+              })()}
+            </button>
+          </div>
+        `;
+      }).join('');
     }
 
     fetch('pp_files/pp_store/scoresShop.csv')
       .then(res => res.text())
       .then(text => {
         allProducts = parseCSV(text);
-        // Sort by most recent year (descending)
-        allProducts = allProducts.sort((a, b) => {
-          const yearA = parseInt(a.year, 10) || 0;
-          const yearB = parseInt(b.year, 10) || 0;
-          return yearB - yearA;
-        });
+        // Sort in reverse order of the CSV (last row first)
+        allProducts = allProducts.reverse();
         renderStore(allProducts);
       });
 
@@ -115,10 +139,20 @@
       }
     });
 
-    // Delegate click for info-btn to handle special characters safely
+    // Make entire product card clickable
     document.addEventListener('click', function(e) {
-      if (e.target && e.target.classList.contains('info-btn')) {
-        const encodedTitle = e.target.getAttribute('data-title');
+      const card = e.target.closest('.product-card');
+      if (card) {
+        const encodedTitle = card.getAttribute('data-title');
+        if (encodedTitle) {
+          window.location.href = 'product-details.html?title=' + encodedTitle;
+        }
+      }
+    });
+    // Optional: allow keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if ((e.key === 'Enter' || e.key === ' ') && document.activeElement.classList.contains('product-card')) {
+        const encodedTitle = document.activeElement.getAttribute('data-title');
         if (encodedTitle) {
           window.location.href = 'product-details.html?title=' + encodedTitle;
         }
