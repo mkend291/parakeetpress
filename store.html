@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Store | Parakeet Press</title>
   <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
   <header>
@@ -69,31 +70,13 @@
     let allProducts = [];
     function renderStore(products) {
       const container = document.getElementById('store-cards');
-      // Dynamically generated list of cover images
-      const coverImgs = [
-        "Amazing Grace.jpg",
-        "Aura Lee.jpg",
-        "Eternal Source of Light Divine (Handel).jpg",
-        "Greensleeves.jpeg",
-        "Lullaby (Brahms).jpg",
-        "Morning Prayer (Tchaikovsky).jpg",
-        "Never Coming Back (Duet).jpg",
-        "Ode to Joy (Beethoven).jpg",
-        "Paraphrase on Rhapsody in Blue.jpeg",
-        "Sarabande (Handel).jpg",
-        "Scarborough Fair.jpeg",
-        "Simple Gifts.jpg",
-        "Six Selections from Kinderszenen (Schumann).jpg"
-      ];
       container.innerHTML = products.map((p, idx) => {
-        // Try to find a matching cover image (jpg or jpeg)
         const safeTitle = (p.title || '').trim();
-        let imgFile = coverImgs.find(f => f.toLowerCase() === safeTitle.toLowerCase() + '.jpg') ||
-                      coverImgs.find(f => f.toLowerCase() === safeTitle.toLowerCase() + '.jpeg');
-        let imgTag = '';
-        if (imgFile) {
-          imgTag = `<img src="pp_files/pp_store/pp_cover-imgs/${imgFile}" alt="${safeTitle} cover" class="cover-img">`;
-        }
+        // Try both .jpg and .jpeg extensions
+        const imgJpg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpg`;
+        const imgJpeg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpeg`;
+        // Try .jpg first, then .jpeg if .jpg fails
+        let imgTag = `<img src="${imgJpg}" alt="${safeTitle} cover" class="cover-img" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.style.display='none';}">`;
         const detailUrl = 'product-details.html?title=' + encodeURIComponent(p.title);
         return `
           <div class="product-card" data-title="${encodeURIComponent(p.title)}" tabindex="0" style="cursor:pointer;">
