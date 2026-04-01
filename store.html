@@ -26,6 +26,7 @@
         <input id="store-search" type="text" placeholder="Search by title, instrument, or year..." style="width:320px;max-width:90vw;padding:0.6em 1em;border-radius:10px;border:1.5px solid #785c52;font-size:1em;">
       </div>
       <div id="store-cards" class="store-cards"></div>
+      <div id="pagination-controls" style="text-align:center;margin:2em 0 1em 0;"></div>
     </section>
   </main>
   <footer>
@@ -68,9 +69,15 @@
     }
 
     let allProducts = [];
-    function renderStore(products) {
+    let currentPage = 1;
+    const pageSize = 9;
+
+    function renderStore(products, page = 1) {
       const container = document.getElementById('store-cards');
-      container.innerHTML = products.map((p, idx) => {
+      const startIdx = (page - 1) * pageSize;
+      const endIdx = startIdx + pageSize;
+      const pageProducts = products.slice(startIdx, endIdx);
+      container.innerHTML = pageProducts.map((p, idx) => {
         const safeTitle = (p.title || '').trim();
         // Try both .jpg and .jpeg extensions
         const imgJpg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpg`;
@@ -95,6 +102,38 @@
           </div>
         `;
       }).join('');
+      renderPagination(products.length, page);
+    }
+
+    function renderPagination(totalItems, page) {
+      const controls = document.getElementById('pagination-controls');
+      const totalPages = Math.ceil(totalItems / pageSize);
+      if (totalPages <= 1) {
+        controls.innerHTML = '';
+        return;
+      }
+      let html = '';
+      if (page > 1) {
+        html += `<button id="prev-page" style="margin:0 1em 0 0;padding:0.5em 1.2em;">Previous</button>`;
+      }
+      html += `<span style="font-size:1.1em;">Page ${page} of ${totalPages}</span>`;
+      if (page < totalPages) {
+        html += `<button id="next-page" style="margin:0 0 0 1em;padding:0.5em 1.2em;">Next</button>`;
+      }
+      controls.innerHTML = html;
+      // Add event listeners
+      if (page > 1) {
+        document.getElementById('prev-page').onclick = function() {
+          currentPage--;
+          renderStore(allProducts, currentPage);
+        };
+      }
+      if (page < totalPages) {
+        document.getElementById('next-page').onclick = function() {
+          currentPage++;
+          renderStore(allProducts, currentPage);
+        };
+      }
     }
 
     fetch('pp_files/pp_store/scoresShop.csv')
@@ -103,14 +142,15 @@
         allProducts = parseCSV(text);
         // Sort in reverse order of the CSV (last row first)
         allProducts = allProducts.reverse();
-        renderStore(allProducts);
+        renderStore(allProducts, currentPage);
       });
 
     document.addEventListener('input', function(e) {
       if (e.target && e.target.id === 'store-search') {
         const q = e.target.value.trim().toLowerCase();
         if (!q) {
-          renderStore(allProducts);
+          currentPage = 1;
+          renderStore(allProducts, currentPage);
           return;
         }
         const filtered = allProducts.filter(p =>
@@ -118,7 +158,8 @@
           (p.instrumentation && p.instrumentation.toLowerCase().includes(q)) ||
           (p.year && p.year.toLowerCase().includes(q))
         );
-        renderStore(filtered);
+        currentPage = 1;
+        renderStore(filtered, currentPage);
       }
     });
 

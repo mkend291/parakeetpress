@@ -221,6 +221,18 @@
         }
       }
       const priceNotes = p.priceNotes && hideIfNA(p.priceNotes) ? `<div style='margin:0.2em 0 0.7em 0;font-style:italic;color:#555;'>${p.priceNotes}</div>` : '';
+      let directPrice = p.directPrice && hideIfNA(p.directPrice) ? p.directPrice : '';
+      let percentOff = '';
+      if (price && directPrice) {
+        // Remove $ and commas, parse as float
+        const vendorNum = parseFloat(price.replace(/[^\d.]/g, ''));
+        const directNum = parseFloat(directPrice.replace(/[^\d.]/g, ''));
+        if (isFinite(vendorNum) && isFinite(directNum) && vendorNum > 0 && directNum < vendorNum) {
+          const pct = Math.round((1 - directNum / vendorNum) * 100);
+          percentOff = ` (${pct}% off)`;
+        }
+      }
+      if (directPrice && !directPrice.startsWith('$')) directPrice = `$${directPrice}`;
       return `
         <div class="product-detail-full">
           <h2 style="margin-top:0;">${title}</h2>
@@ -229,14 +241,15 @@
           ${duration ? `<p><strong>Duration:</strong> ${duration} min</p>` : ''}
           ${year ? `<p><strong>Year:</strong> ${year}</p>` : ''}
             ${info ? `<p><strong>Info:</strong> ${info}</p>` : ''}
-          ${price ? `<div style="margin:1.2em 0 0.2em 0;font-weight:bold;">Price: <span style='font-weight:normal;'>${price}</span></div>` : ''}
+          ${price ? `<div style="margin:1.2em 0 0.2em 0;font-weight:bold;">Vendor Price: <span style='font-weight:normal;'>${price}</span></div>` : ''}
           ${priceNotes}
+          ${directPrice ? `<div style=\"margin:0.2em 0 0.7em 0;font-weight:bold;\">Direct Price: <span style='font-weight:normal;'><span style='text-decoration:line-through;margin-right:0.5em;'>${price}</span><span style='color:#a55;'>${directPrice}${percentOff}</span></span></div>` : ''}
           <div style="margin:0.5em 0 0.5em 0;font-weight:bold;">Purchase Options:</div>
           ${multiPartsBlock}
           ${isMultipleParts ? '<div style="margin:0.5em 0 0.5em 3.5em;font-weight:bold;">or</div>' : ''}
           ${buyBtn}
           <div style="margin-top:0.7em;font-size:0.98em;color:#785c52;background:rgba(251,249,242,0.7);border-radius:8px;padding:0.7em 1em 0.7em 1em;max-width:480px;">
-            <span style="font-weight:bold;">Save up to 30% by purchasing directly from Daniel.</span> Vendors take a significant cut, so buying direct saves you from paying extra while also allowing me to receive more of your support.
+            <span style="font-weight:bold;">Save up to 50% by purchasing directly from Daniel.</span> ArrangeMe (vendor) regulates the minimum price for each piece and takes a significant portion of each purchase. Buying direct saves you from paying the vendor's portion while also allowing me to receive more of your support. Please request the music via email, and I will send you the score. After payment, I will send the parts. 
           </div>
           ${videoEmbed}
         </div>

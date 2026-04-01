@@ -1,3 +1,12 @@
+@media (max-width: 600px) {
+  .cover-img {
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 1;
+    width: 100%;
+    transform: none;
+  }
+}
 /* Full width cover image for details page */
 .cover-img-full {
   display: block;
@@ -102,6 +111,18 @@
   gap: 2em;
   justify-content: center;
   margin-top: 2em;
+}
+
+/* Responsive: Stretch cards to full width in single-column layout */
+@media (max-width: 600px) {
+  .product-card,
+  .store-card {
+    min-width: 0;
+    max-width: 100%;
+    flex-basis: 100%;
+    width: 100%;
+    align-self: stretch;
+  }
 }
 .product-card {
   background: rgba(251, 249, 242, 0.85);
