@@ -84,13 +84,13 @@
         const imgJpeg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpeg`;
         // Try .jpg first, then .jpeg if .jpg fails
         let imgTag = `<img src="${imgJpg}" alt="${safeTitle} cover" class="cover-img" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.style.display='none';}">`;
-        const detailUrl = 'product-details.html?title=' + encodeURIComponent(p.title);
+        const detailUrl = 'product-details.html?id=' + encodeURIComponent(p.id);
         return `
-          <div class="product-card" data-title="${encodeURIComponent(p.title)}" tabindex="0" style="cursor:pointer;">
+          <div class="product-card" data-id="${encodeURIComponent(p.id)}" tabindex="0" style="cursor:pointer;">
             ${imgTag}
             <h3 style="margin-bottom:0.3em;font-size:1.08em;">${p.title}</h3>
             <div style="font-size:0.98em;color:#785c52;margin-bottom:0.1em;">${p.instrumentation} ${p.duration ? `(${p.duration} min.)` : ''}</div>
-            <button class="info-btn" data-title="${encodeURIComponent(p.title)}" style="margin-top:auto;width:100%;font-size:0.98em;" tabindex="-1">
+            <button class="info-btn" data-id="${encodeURIComponent(p.id)}" style="margin-top:auto;width:100%;font-size:0.98em;" tabindex="-1">
               Buy${(() => {
                 if (p.price && p.price.trim()) {
                   const num = parseFloat(p.price.replace(/[^\d.]/g, ''));
@@ -167,18 +167,18 @@
     document.addEventListener('click', function(e) {
       const card = e.target.closest('.product-card');
       if (card) {
-        const encodedTitle = card.getAttribute('data-title');
-        if (encodedTitle) {
-          window.location.href = 'product-details.html?title=' + encodedTitle;
+        const encodedId = card.getAttribute('data-id');
+        if (encodedId) {
+          window.location.href = 'product-details.html?id=' + encodedId;
         }
       }
     });
     // Optional: allow keyboard navigation
     document.addEventListener('keydown', function(e) {
       if ((e.key === 'Enter' || e.key === ' ') && document.activeElement.classList.contains('product-card')) {
-        const encodedTitle = document.activeElement.getAttribute('data-title');
-        if (encodedTitle) {
-          window.location.href = 'product-details.html?title=' + encodedTitle;
+        const encodedId = document.activeElement.getAttribute('data-id');
+        if (encodedId) {
+          window.location.href = 'product-details.html?id=' + encodedId;
         }
       }
     });

@@ -133,9 +133,9 @@
         return obj;
       });
     }
-    function getTitle() {
+    function getId() {
       const params = new URLSearchParams(window.location.search);
-      return params.get('title');
+      return params.get('id');
     }
     function renderProduct(p) {
             // Dynamically generate possible cover image filenames
@@ -340,13 +340,13 @@
           showError('Error parsing product data.');
           throw e;
         }
-        const rawTitle = getTitle();
-        if (!rawTitle) {
+        const rawId = getId();
+        if (!rawId) {
           showError('No product specified.');
           return;
         }
-        const decodedTitle = decodeURIComponent(rawTitle).replace(/\+/g, ' ').trim().toLowerCase();
-        const p = products.find(prod => (prod.title || '').trim().toLowerCase() === decodedTitle);
+        const decodedId = decodeURIComponent(rawId).replace(/\+/g, ' ').trim();
+        const p = products.find(prod => (prod.id || '').trim() === decodedId);
         if (!p) {
           showError('Product not found.');
           return;
