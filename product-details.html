@@ -91,7 +91,7 @@
   </header>
   <main>
     <section id="product-detail" style="margin-top:2em;">
-      <a href="store.html" class="buy-btn" style="display:inline-block;margin-bottom:1.2em;padding:0.5em 1.5em;font-size:1em;">&larr; Back to Store</a>
+      <a href="store.html" id="back-to-store" class="buy-btn" style="display:inline-block;margin-bottom:1.2em;padding:0.5em 1.5em;font-size:1em;">&larr; Back to Store</a>
       <div id="product-detail-card"></div>
     </section>
   </main>
@@ -136,6 +136,11 @@
     function getId() {
       const params = new URLSearchParams(window.location.search);
       return params.get('id');
+    }
+
+    function getPage() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('page');
     }
     function renderProduct(p) {
             // Dynamically generate possible cover image filenames
@@ -237,6 +242,7 @@
         <div class="product-detail-full">
           <h2 style="margin-top:0;">${title}</h2>
           ${imgTag}
+          ${videoEmbed}
           ${instrumentation ? `<p><strong>Instrumentation:</strong> ${instrumentation}</p>` : ''}
           ${duration ? `<p><strong>Duration:</strong> ${duration} min</p>` : ''}
           ${year ? `<p><strong>Year:</strong> ${year}</p>` : ''}
@@ -244,6 +250,8 @@
           ${price ? `<div style="margin:1.2em 0 0.2em 0;font-weight:bold;">Vendor Price: <span style='font-weight:normal;'>${price}</span></div>` : ''}
           ${priceNotes}
           ${directPrice ? `<div style=\"margin:0.2em 0 0.7em 0;font-weight:bold;\">Direct Price: <span style='font-weight:normal;'><span style='text-decoration:line-through;margin-right:0.5em;'>${price}</span><span style='color:#a55;'>${directPrice}${percentOff}</span></span></div>` : ''}
+            <!-- Total Sold placeholder (value to be filled later) -->
+            <div id="total-sold" style="margin:0.4em 0 0.4em 0;font-weight:bold;">Total Sold: <span id="total-sold-value" style="font-weight:normal;"></span></div>
           <div style="margin:0.5em 0 0.5em 0;font-weight:bold;">Purchase Options:</div>
           ${multiPartsBlock}
           ${isMultipleParts ? '<div style="margin:0.5em 0 0.5em 3.5em;font-weight:bold;">or</div>' : ''}
@@ -251,7 +259,10 @@
           <div style="margin-top:0.7em;font-size:0.98em;color:#785c52;background:rgba(251,249,242,0.7);border-radius:8px;padding:0.7em 1em 0.7em 1em;max-width:480px;">
             <span style="font-weight:bold;">Save up to 50% by purchasing directly from Daniel.</span> ArrangeMe (vendor) regulates the minimum price for each piece and takes a significant portion of each purchase. Buying direct saves you from paying the vendor's portion while also allowing me to receive more of your support. Please request the music via email, and I will send you the score. After payment, I will send the parts. 
           </div>
-          ${videoEmbed}
+          <!-- Commission diagram: responsive and constrained to container -->
+          <div style="margin-top:1em;text-align:center;">
+            <img src="pp_files/commission-diagram.jpeg" alt="Commission diagram" class="commission-diagram" loading="lazy">
+          </div>
         </div>
         <div class="modal-bg" id="email-modal">
           <form class="modal-form" id="email-form" onsubmit="return false;">
@@ -324,6 +335,76 @@
 
       card.innerHTML = `<div class="not-available">${msg}</div>`;
     }
+    function fetchSalesCount(productTitle) {
+      function normalize(value) {
+        return (value || '').trim().toLowerCase();
+      }
+
+      function baseWithoutParen(title) {
+        return normalize((title || '').replace(/\([^)]*\)/g, '').trim());
+      }
+
+      function containsAndPiano(title) {
+        return /(?:\band\s+piano\b|&\s*piano\b)/i.test(title || '');
+      }
+
+      function baseFromSalesPianoTitle(title) {
+        const withoutPianoParen = (title || '').replace(/\([^)]*(?:and|&)\s*piano[^)]*\)/i, '').trim();
+        return baseWithoutParen(withoutPianoParen);
+      }
+
+      return Promise.all([
+        fetch('pp_files/pp_store/ArrangeMe_Sales_Report.csv').then(res => res.text()),
+        fetch('pp_files/pp_store/solo-arr-catalogue.csv').then(res => res.text())
+      ])
+        .then(([salesText, soloText]) => {
+          const salesRows = parseCSV(salesText);
+          const soloRows = parseCSV(soloText);
+          const productTitleNormalized = normalize(productTitle);
+
+          const soloTitles = soloRows
+            .map(row => (row.Title || row.title || '').trim())
+            .filter(Boolean);
+
+          function mapSalesTitleToScoreTitle(salesTitle) {
+            const salesTitleNormalized = normalize(salesTitle);
+            const directSoloMatch = soloTitles.find(title => normalize(title) === salesTitleNormalized);
+            if (directSoloMatch) {
+              return normalize(directSoloMatch);
+            }
+
+            if (containsAndPiano(salesTitle)) {
+              const salesBase = baseFromSalesPianoTitle(salesTitle);
+              const mappedSolo = soloTitles.find(title => baseWithoutParen(title) === salesBase);
+              if (mappedSolo) {
+                return normalize(mappedSolo);
+              }
+            }
+
+            return salesTitleNormalized;
+          }
+
+          let count = 0;
+          salesRows.forEach(row => {
+            const txType = normalize(row['Transaction Type'] || row['transaction type']);
+            if (txType !== 'purchase') {
+              return;
+            }
+
+            const salesTitle = (row.Title || row.title || '').trim();
+            const mappedTitle = mapSalesTitleToScoreTitle(salesTitle);
+            if (mappedTitle === productTitleNormalized) {
+              count++;
+            }
+          });
+
+          return count;
+        })
+        .catch(e => {
+          console.error('Error fetching sales data:', e);
+          return 0;
+        });
+    }
     fetch('pp_files/pp_store/scoresShop.csv')
       .then(res => {
         if (!res.ok) {
@@ -353,6 +434,19 @@
         }
         try {
           card.innerHTML = renderProduct(p);
+          // Fetch sales count and update Total Sold if > 0
+          fetchSalesCount(p.title).then(count => {
+            const totalSoldDiv = document.getElementById('total-sold');
+            const totalSoldValue = document.getElementById('total-sold-value');
+            if (count > 0) {
+              totalSoldValue.textContent = count;
+            } else {
+              // Hide Total Sold if count is 0
+              if (totalSoldDiv) {
+                totalSoldDiv.style.display = 'none';
+              }
+            }
+          });
           // Attach modal event listeners after rendering
           setTimeout(() => {
             const openBtn = document.getElementById('open-email-modal');
@@ -382,6 +476,16 @@
               };
             }
           }, 0);
+          // Update Back link to restore store page if `page` was provided
+          try {
+            const pageParam = getPage();
+            const back = document.getElementById('back-to-store');
+            if (back) {
+              back.href = 'store.html' + (pageParam ? ('?page=' + encodeURIComponent(pageParam)) : '');
+            }
+          } catch (e) {
+            // ignore
+          }
         } catch (e) {
           showError('Error displaying product details.');
         }

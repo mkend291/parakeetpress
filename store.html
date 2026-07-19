@@ -22,8 +22,16 @@
   <main>
     <section id="store" style="margin-top:2em;">
       <h2>Store</h2>
-      <div style="text-align:center;margin-bottom:1.5em;">
-        <input id="store-search" type="text" placeholder="Search by title, instrument, or year..." style="width:320px;max-width:90vw;padding:0.6em 1em;border-radius:10px;border:1.5px solid #785c52;font-size:1em;">
+      <div style="text-align:center;margin-bottom:1.5em;display:flex;gap:0.6em;justify-content:center;align-items:center;flex-wrap:wrap;">
+        <input id="store-search" type="text" placeholder="Search by title, instrument, or year..." style="width:320px;max-width:40vw;padding:0.6em 1em;border-radius:10px;border:1.5px solid #785c52;font-size:1em;">
+        <select id="type-filter" style="padding:0.55em 0.9em;border-radius:10px;border:1.5px solid #785c52;background:#fff;font-size:0.95em;">
+          <option value="all">Show all</option>
+          <option value="originals">Originals only</option>
+          <option value="arrangements">Arrangements only</option>
+        </select>
+        <select id="inst-filter" style="padding:0.55em 0.9em;border-radius:10px;border:1.5px solid #785c52;background:#fff;font-size:0.95em;min-width:180px;">
+          <option value="all">All instruments</option>
+        </select>
       </div>
       <div id="store-cards" class="store-cards"></div>
       <div id="pagination-controls" style="text-align:center;margin:2em 0 1em 0;"></div>
@@ -72,6 +80,62 @@
     // Read initial page from URL so links/bookmarks preserve pagination
     let currentPage = parseInt(new URLSearchParams(window.location.search).get('page')) || 1;
     const pageSize = 18;
+    let lastFilteredProducts = [];
+
+    function getFilteredProducts() {
+      const q = (document.getElementById('store-search')?.value || '').trim().toLowerCase();
+      const type = (document.getElementById('type-filter')?.value || 'all');
+      const inst = (document.getElementById('inst-filter')?.value || 'all');
+      return allProducts.filter(p => {
+        // Search match
+        if (q) {
+          const matches = (p.title && p.title.toLowerCase().includes(q)) ||
+                          (p.instrumentation && p.instrumentation.toLowerCase().includes(q)) ||
+                          (p.year && p.year.toLowerCase().includes(q));
+          if (!matches) return false;
+        }
+        // Type filter using priceNotes
+        const notes = (p.priceNotes || '').toLowerCase();
+        if (type === 'originals') {
+          if (!notes.includes('original')) return false;
+        } else if (type === 'arrangements') {
+          if (!(notes.includes('copyright') || notes.includes('public domain'))) return false;
+        }
+        // Instrumentation exact-string filter (as shown in CSV)
+        if (inst !== 'all') {
+          const instr = (p.instrumentation || '').trim();
+          if (instr !== inst) return false;
+        }
+        return true;
+      });
+    }
+
+    function populateInstrumentationFilter(products) {
+      const counts = {};
+      products.forEach(p => {
+        const k = (p.instrumentation || '').trim();
+        if (!k || k.toLowerCase() === 'n/a') return;
+        counts[k] = (counts[k] || 0) + 1;
+      });
+      const instSelect = document.getElementById('inst-filter');
+      if (!instSelect) return;
+      // Clear existing (keep first 'all')
+      instSelect.innerHTML = '<option value="all">All instruments</option>';
+      Object.keys(counts).sort((a,b)=> a.localeCompare(b)).forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.textContent = `${k} (${counts[k]})`;
+        instSelect.appendChild(opt);
+      });
+    }
+
+    function updateAndRender(page) {
+      if (typeof page === 'number') currentPage = page;
+      if (!currentPage || currentPage < 1) currentPage = 1;
+      const filtered = getFilteredProducts();
+      lastFilteredProducts = filtered;
+      renderStore(filtered, currentPage);
+    }
 
     function renderStore(products, page = 1) {
       const container = document.getElementById('store-cards');
@@ -91,7 +155,7 @@
         const imgJpeg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpeg`;
         // Try .jpg first, then .jpeg if .jpg fails
         let imgTag = `<img src="${imgJpg}" alt="${safeTitle} cover" class="cover-img" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.style.display='none';}">`;
-        const detailUrl = 'product-details.html?id=' + encodeURIComponent(p.id);
+        const detailUrl = 'product-details.html?id=' + encodeURIComponent(p.id) + '&page=' + encodeURIComponent(currentPage);
         return `
           <div class="product-card" data-id="${encodeURIComponent(p.id)}" tabindex="0" style="cursor:pointer;">
             ${imgTag}
@@ -140,14 +204,12 @@
       // Add event listeners
       if (page > 1) {
         document.getElementById('prev-page').onclick = function() {
-          currentPage--;
-          renderStore(allProducts, currentPage);
+          updateAndRender(currentPage - 1);
         };
       }
       if (page < totalPages) {
         document.getElementById('next-page').onclick = function() {
-          currentPage++;
-          renderStore(allProducts, currentPage);
+          updateAndRender(currentPage + 1);
         };
       }
     }
@@ -158,25 +220,22 @@
         allProducts = parseCSV(text);
         // Sort in reverse order of the CSV (last row first)
         allProducts = allProducts.reverse();
-        renderStore(allProducts, currentPage);
+        // Populate instrumentation filter options with counts
+        populateInstrumentationFilter(allProducts);
+        // Render using current filters and page
+        updateAndRender(currentPage);
       });
 
-    document.addEventListener('input', function(e) {
-      if (e.target && e.target.id === 'store-search') {
-        const q = e.target.value.trim().toLowerCase();
-        if (!q) {
-          currentPage = 1;
-          renderStore(allProducts, currentPage);
-          return;
-        }
-        const filtered = allProducts.filter(p =>
-          (p.title && p.title.toLowerCase().includes(q)) ||
-          (p.instrumentation && p.instrumentation.toLowerCase().includes(q)) ||
-          (p.year && p.year.toLowerCase().includes(q))
-        );
-        currentPage = 1;
-        renderStore(filtered, currentPage);
-      }
+    // Wire search box to use centralized filtering
+    document.getElementById('store-search').addEventListener('input', function() {
+      updateAndRender(1);
+    });
+    // Wire filter dropdowns
+    document.getElementById('type-filter').addEventListener('change', function() {
+      updateAndRender(1);
+    });
+    document.getElementById('inst-filter').addEventListener('change', function() {
+      updateAndRender(1);
     });
 
     // Make entire product card clickable
@@ -185,7 +244,7 @@
       if (card) {
         const encodedId = card.getAttribute('data-id');
         if (encodedId) {
-          window.location.href = 'product-details.html?id=' + encodedId;
+          window.location.href = 'product-details.html?id=' + encodedId + '&page=' + encodeURIComponent(currentPage);
         }
       }
     });
@@ -194,7 +253,7 @@
       if ((e.key === 'Enter' || e.key === ' ') && document.activeElement.classList.contains('product-card')) {
         const encodedId = document.activeElement.getAttribute('data-id');
         if (encodedId) {
-          window.location.href = 'product-details.html?id=' + encodedId;
+          window.location.href = 'product-details.html?id=' + encodedId + '&page=' + encodeURIComponent(currentPage);
         }
       }
     });

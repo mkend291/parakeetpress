@@ -380,7 +380,6 @@
     margin-left: 2em;
   }
 }
-}
 /* Hero Media Styling */
 .hero-media {
   display: flex;
@@ -530,13 +529,13 @@ main, header, footer, .work {
   z-index: 1;
 }
 header {
-  background: #222;
-  color: #fff;
+  background: #785c52;
+  color: #fbf9f2;
   padding: 1em 0;
   text-align: center;
 }
 nav a {
-  color: #fff;
+  color: #fbf9f2;
   margin: 0 1em;
   text-decoration: none;
   font-weight: bold;
@@ -556,70 +555,26 @@ section {
   box-shadow: 0 8px 32px rgba(120, 92, 82, 0.18);
   z-index: 1;
 }
-  border: 1px solid #eee;
-  padding: 1em;
-  margin-bottom: 1em;
-  background: #fafafa;
-  border-radius: 8px;
-}
+
 .work img {
   max-width: 100%;
   border-radius: 8px;
 }
-  background: #222;
-  color: #fff;
+
+footer {
+  background: #785c52;
+  color: #fbf9f2;
   text-align: center;
   padding: 1em 0;
-  position: fixed;
   width: 100%;
-  bottom: 0;
 }
-    body {
-      font-family: 'Avenir', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #fbf9f2 url('pp_files/PP_BG_1.png') no-repeat center center fixed;
-      background-size: cover;
-      color: #785c52;
-    }
-    header {
-      background: #785c52;
-      color: #fbf9f2;
-      padding: 1em 0;
-      text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-    nav a {
-      color: #fbf9f2;
-      margin: 0 1em;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    main {
-      max-width: 900px;
-      margin: 2em auto;
-      padding: 0 1em;
-    }
-    section {
-      margin-bottom: 2em;
-    }
-    .work {
-      border: 1px solid #785c52;
-      padding: 1em;
-      margin-bottom: 1em;
-      background: rgba(251, 249, 242, 0.85);
-      border-radius: 8px;
-    }
-    .work img {
-      max-width: 100%;
-      border-radius: 8px;
-    }
-    footer {
-      background: #785c52;
-      color: #fbf9f2;
-      text-align: center;
-      padding: 1em 0;
-      width: 100%;
-    }
+
+/* Commission diagram responsive image */
+.commission-diagram {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0.6em auto;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
