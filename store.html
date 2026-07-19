@@ -69,11 +69,18 @@
     }
 
     let allProducts = [];
-    let currentPage = 1;
-    const pageSize = 9;
+    // Read initial page from URL so links/bookmarks preserve pagination
+    let currentPage = parseInt(new URLSearchParams(window.location.search).get('page')) || 1;
+    const pageSize = 18;
 
     function renderStore(products, page = 1) {
       const container = document.getElementById('store-cards');
+      const totalPages = Math.max(1, Math.ceil(products.length / pageSize));
+      // Clamp page into valid range
+      if (page < 1) page = 1;
+      if (page > totalPages) page = totalPages;
+      // Update global currentPage
+      currentPage = page;
       const startIdx = (page - 1) * pageSize;
       const endIdx = startIdx + pageSize;
       const pageProducts = products.slice(startIdx, endIdx);
@@ -103,6 +110,15 @@
         `;
       }).join('');
       renderPagination(products.length, page);
+      // Update the URL so pagination is bookmarkable and preserved on back/forward
+      try {
+        const params = new URLSearchParams(window.location.search);
+        params.set('page', String(page));
+        const newUrl = window.location.pathname + '?' + params.toString();
+        window.history.replaceState({}, '', newUrl);
+      } catch (e) {
+        // ignore if history is not available
+      }
     }
 
     function renderPagination(totalItems, page) {
