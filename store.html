@@ -160,9 +160,10 @@
 
       container.innerHTML = pageProducts.map((p) => {
         const safeTitle = (p.title || '').trim();
+        const escapedTitle = safeTitle.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         const imgJpg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpg`;
         const imgJpeg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpeg`;
-        const imgTag = `<img src="${imgJpg}" alt="${safeTitle} cover" class="cover-img" loading="lazy" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.style.display='none';}">`;
+        const imgTag = `<img src="${imgJpg}" alt="${escapedTitle} cover" class="cover-img" loading="lazy" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.parentElement.innerHTML='<div class=\\'cover-placeholder\\'><i class=\\'fas fa-music\\'></i><span>${escapedTitle}</span></div>';};">`;
 
         let priceText = 'View Details';
         if (p.price && p.price.trim()) {
