@@ -3,127 +3,145 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Parakeet Press</title>
+  <title>Parakeet Press — Sheet Music Publisher & Music of Daniel S. Kim</title>
   <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-  <header>
-    <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" style="height:48px;vertical-align:middle;margin-right:12px;border-radius:12px;">
-    <a href="index.html" style="text-decoration:none;color:inherit;"><h1 style="display:inline;vertical-align:middle;">PARAKEET PRESS</h1></a>
-    <div style="margin-bottom:8px;"></div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="services.html">Services</a>
-      <a href="store.html">Store</a>
-      <a href="chirp.html">Chirp!</a>
-    </nav>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo-link">
+        <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" class="logo-img">
+        <span class="logo-text">Parakeet Press</span>
+      </a>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link active">Home</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
+          <li><a href="store.html" class="nav-link">Store</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
+
   <main>
     <section id="intro">
       <h2>Music of Daniel S. Kim</h2>
-      <p style="text-align:center;">Composer • Arranger • Pianist</p>
-      <div class="hero-media">
-      <div style="width:100%;display:flex;justify-content:center;">
-        <div class="hero-media">
+      <p class="section-subtitle">Composer • Arranger • Pianist</p>
+      <div class="hero-media-wrapper">
+        <div class="hero-media-item">
           <img src="pp_files/Headshot_B_small.jpg" alt="Daniel Kim Headshot" class="hero-headshot">
-          <div class="video-container" style="position:relative;display:inline-block;">
-            <video src="pp_files/PP_Logo_Video.mp4" class="hero-video" autoplay loop muted playsinline></video>
-            <button id="sound-toggle" aria-label="Toggle sound" style="position:absolute;top:10px;right:10px;background:rgba(251,249,242,0.85);border:none;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(120,92,82,0.15);cursor:pointer;z-index:2;">
-              <svg id="sound-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#785c52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path id="sound-waves" d="M19 12c0-2.21-1.79-4-4-4m4 4c0 2.21-1.79 4-4 4"/></svg>
-            </button>
-          </div>
+        </div>
+        <div class="hero-media-item video-container">
+          <video src="pp_files/PP_Logo_Video.mp4" class="hero-video" autoplay loop muted playsinline></video>
+          <button id="sound-toggle" aria-label="Toggle sound">
+            <svg id="sound-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6c4e43" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path id="sound-waves" d="M19 12"/>
+            </svg>
+          </button>
         </div>
       </div>
     </section>
+
     <section id="works">
       <h2>Featured Works</h2>
+      <p class="section-subtitle">Performances & Score Recordings</p>
       <div class="featured-works">
-        <div class="work">
-          <iframe width="100%" height="250" src="https://www.youtube.com/embed/-xzdthOCYpQ" frameborder="0" allowfullscreen></iframe>
+        <div class="work-card">
+          <iframe src="https://www.youtube.com/embed/-xzdthOCYpQ" title="Featured Work 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
-        <div class="work">
-          <iframe width="100%" height="250" src="https://www.youtube.com/embed/mwB2XU2mDl8" frameborder="0" allowfullscreen></iframe>
+        <div class="work-card">
+          <iframe src="https://www.youtube.com/embed/mwB2XU2mDl8" title="Featured Work 2" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
       </div>
     </section>
+
     <section id="about">
-      <h2>About Me</h2>
+      <h2>About the Composer</h2>
       <p>Daniel Kim (b. 2000) is a composer and pianist whose music features strong thematic elements and the recontextualizing of motivic material within varied textures and harmonies. He strives to create storytelling music through sweeping orchestral textures and indelible melodies. His influences span classical, film, and video game music, including Claude Debussy, John Williams, Joe Hisaishi, and Christopher Tin.</p>
       <p>Daniel has written for ensembles such as the UT New Music Ensemble, the U.S. Naval Academy Band, the Illinois State University Wind Symphony, and the International Double Reed Society. He is also a composer, arranger, performer, and artistic advisor for the Asian Memory Project, a group that performs music from Asian films and games at family-friendly events.</p>
       <p>Daniel holds a bachelor’s degree in composition from the University of Texas at Austin and a master’s degree from the University of Michigan. His mentors include Bruce Pennycook, Yevgeny Sharlat, Russel Podgorsek, Donald Grantham, Michael Daugherty, and Penka Kouneva.</p>
     </section>
+
+    <section id="related-sites">
+      <h2>Related Sites</h2>
+      <div class="related-sites-grid">
+        <div class="related-site-card">
+          <img src="pp_files/Headshot_B_small.jpg" alt="Daniel Kim Composer" class="related-site-logo">
+          <h3>Daniel Kim, Composer</h3>
+          <p>Personal portfolio featuring concert scores, media music, events, and interactive musical tools.</p>
+          <a href="https://mkend291.github.io/dankimcomposer/" target="_blank" rel="noopener" class="related-site-link">Visit Personal Website &rarr;</a>
+        </div>
+        <div class="related-site-card">
+          <img src="pp_files/AMP_Web_Logo.jpg" alt="Asian Memory Project Logo" class="related-site-logo">
+          <h3>Asian Memory Project</h3>
+          <p>Ensemble and production collective performing nostalgic music from Asian cinema, anime, and games.</p>
+          <a href="https://mkend291.github.io/asianmemoryproject/" target="_blank" rel="noopener" class="related-site-link">Visit Asian Memory Project &rarr;</a>
+        </div>
+      </div>
+    </section>
+
     <section id="contact">
-        <section id="involved">
-          <h2>RELATED SITES</h2>
-          <div class="involved-links">
-            <a class="involved-btn" href="https://mkend291.github.io/dankimcomposer/" target="_blank">
-              Personal Website
-            </a>
-            <a class="involved-btn" href="https://mkend291.github.io/asianmemoryproject/" target="_blank">
-              Asian Memory Project
-            </a>
-          </div>
-        </section>
       <h2>Get in Touch</h2>
+      <p class="section-subtitle">Commissions • Inquiries • Questions</p>
       <div class="contact-buttons">
-        <a class="contact-btn email" href="mailto:dankimcomposer@gmail.com?subject=Chirp!" title="Email">
-            <span class="icon"><i class="fas fa-envelope"></i></span> Email
+        <a class="contact-btn email" href="mailto:dankimcomposer@gmail.com?subject=Parakeet%20Press%20Inquiry" title="Email">
+          <span class="icon"><i class="fas fa-envelope"></i></span> Email
         </a>
         <a class="contact-btn phone" href="tel:713-979-7934" title="Phone">
-            <span class="icon"><i class="fas fa-mobile-alt"></i></span> Text
+          <span class="icon"><i class="fas fa-mobile-alt"></i></span> Text
         </a>
-        <a class="contact-btn youtube" href="https://www.youtube.com/@dankim291" target="_blank" title="YouTube">
-            <span class="icon"><i class="fab fa-youtube"></i></span> YouTube
+        <a class="contact-btn youtube" href="https://www.youtube.com/@dankim291" target="_blank" rel="noopener" title="YouTube">
+          <span class="icon"><i class="fab fa-youtube"></i></span> YouTube
         </a>
-        <a class="contact-btn discord" href="https://discord.gg/xzfkabWsRA" target="_blank" title="Discord">
-            <span class="icon"><i class="fab fa-discord"></i></span> Discord
+        <a class="contact-btn discord" href="https://discord.gg/xzfkabWsRA" target="_blank" rel="noopener" title="Discord">
+          <span class="icon"><i class="fab fa-discord"></i></span> Discord
         </a>
-        <a class="contact-btn instagram" href="https://www.instagram.com/dankim291/" target="_blank" title="Instagram">
-            <span class="icon"><i class="fab fa-instagram"></i></span> Instagram
-        </a>
-        <a class="contact-btn fiverr" href="https://www.fiverr.com/s/DBZQ91V" target="_blank" title="Fiverr">
-          <span class="icon"><i class="fab fa-fiverr"></i></span> Fiverr
+        <a class="contact-btn instagram" href="https://www.instagram.com/dankim291/" target="_blank" rel="noopener" title="Instagram">
+          <span class="icon"><i class="fab fa-instagram"></i></span> Instagram
         </a>
       </div>
     </section>
   </main>
+
   <footer>
     <p id="copyright"></p>
-    <script>
-      // Dynamic copyright year and rights
-      document.addEventListener('DOMContentLoaded', function() {
-        var year = new Date().getFullYear();
-        var copyright = document.getElementById('copyright');
-        if (copyright) {
-          copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
-        }
-      });
-    </script>
-    <script>
-      // Sound toggle logic for hero video
-      document.addEventListener('DOMContentLoaded', function() {
-        const video = document.querySelector('.hero-video');
-        const btn = document.getElementById('sound-toggle');
-        const waves = document.getElementById('sound-waves');
-        if (!video || !btn || !waves) return;
-        // Set icon state on load
-        function updateIcon() {
-          if (video.muted) {
-            waves.setAttribute('d', 'M19 12'); // Hide waves for muted
-          } else {
-            waves.setAttribute('d', 'M19 12c0-2.21-1.79-4-4-4m4 4c0 2.21-1.79 4-4 4');
-          }
-        }
-        updateIcon();
-        btn.addEventListener('click', function() {
-          video.muted = !video.muted;
-          updateIcon();
-        });
-        // Also update icon if muted state changes by other means
-        video.addEventListener('volumechange', updateIcon);
-      });
-    </script>
   </footer>
+
+  <script>
+    // Dynamic copyright year
+    document.addEventListener('DOMContentLoaded', function() {
+      var year = new Date().getFullYear();
+      var copyright = document.getElementById('copyright');
+      if (copyright) {
+        copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+      }
+    });
+
+    // Sound toggle logic for hero video
+    document.addEventListener('DOMContentLoaded', function() {
+      const video = document.querySelector('.hero-video');
+      const btn = document.getElementById('sound-toggle');
+      const waves = document.getElementById('sound-waves');
+      if (!video || !btn || !waves) return;
+
+      function updateIcon() {
+        if (video.muted) {
+          waves.setAttribute('d', 'M19 12');
+        } else {
+          waves.setAttribute('d', 'M19 12c0-2.21-1.79-4-4-4m4 4c0 2.21-1.79 4-4 4');
+        }
+      }
+      updateIcon();
+
+      btn.addEventListener('click', function() {
+        video.muted = !video.muted;
+        updateIcon();
+      });
+
+      video.addEventListener('volumechange', updateIcon);
+    });
+  </script>
 </body>
 </html>

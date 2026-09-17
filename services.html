@@ -3,92 +3,116 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Services | Parakeet Press</title>
+  <title>Services & Commissions | Parakeet Press</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-  <header>
-    <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" style="height:48px;vertical-align:middle;margin-right:12px;border-radius:12px;">
-    <a href="index.html" style="text-decoration:none;color:inherit;"><h1 style="display:inline;vertical-align:middle;">PARAKEET PRESS</h1></a>
-    <div style="margin-bottom:8px;"></div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="services.html">Services</a>
-      <a href="store.html">Store</a>
-      <a href="chirp.html">Chirp!</a>
-    </nav>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo-link">
+        <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" class="logo-img">
+        <span class="logo-text">Parakeet Press</span>
+      </a>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="services.html" class="nav-link active">Services</a></li>
+          <li><a href="store.html" class="nav-link">Store</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
+
   <main>
-    <section id="services" style="margin-top:2em;">
+    <section id="services">
       <h2>Services & Requests</h2>
+      <p class="section-subtitle">Custom Compositions, Arrangements & Engraving</p>
+
       <div class="services-cards">
         <div class="service-card">
           <h3>Existing Composition</h3>
-          <p>Request scores and parts for works in my catalog. Browse my published compositions and arrangements to find pieces perfect for your ensemble or performance.</p>
-          <a href="store.html" class="request-btn" style="margin-top:1em;min-width:120px;text-align:center;display:inline-block;text-decoration:none;">Visit Store</a>
+          <p>Request scores and parts for works in my catalog. Browse published compositions and arrangements to find pieces tailored for your ensemble or upcoming recital.</p>
+          <a href="store.html" class="request-btn" style="text-decoration:none;display:inline-block;">Visit Store Catalog &rarr;</a>
         </div>
+
         <div class="service-card">
           <h3>Concert Composition</h3>
-          <p>Commission original concert works for ensembles, recitals, and any live performance occasion. I create pieces tailored to your specific instrumentation and artistic vision.</p>
-          <button class="request-btn" data-service="Concert Composition">Request</button>
+          <p>Commission original concert works for ensembles, recitals, and special performance occasions. Tailored meticulously to your ensemble's instrumentation and artistic vision.</p>
+          <button class="request-btn" data-service="Concert Composition">Request Commission</button>
         </div>
+
         <div class="service-card">
           <h3>Media Composition</h3>
-          <p>Original music for multimedia, film, TV, games, documentaries, dance, and other collaborative projects. I specialize in creating evocative soundscapes that enhance your visual storytelling.</p>
-          <button class="request-btn" data-service="Media Composition">Request</button>
+          <p>Original scoring for multimedia, film, television, video games, animation, documentaries, and collaborative projects. Evocative soundscapes crafted for visual storytelling.</p>
+          <button class="request-btn" data-service="Media Composition">Request Scoring</button>
         </div>
+
         <div class="service-card">
-          <h3>Arrangement and Orchestration</h3>
-          <p>Get professional arrangements and orchestrations of your favorite pieces. I specialize in creating arrangements for various ensembles and instrumentations.</p>
-          <button class="request-btn" data-service="Arrangement and Orchestration">Request</button>
+          <h3>Arrangement & Orchestration</h3>
+          <p>High-caliber arrangements and orchestrations of existing concert, film, or game music, re-imagined for various instrumentations from chamber duos to full orchestra.</p>
+          <button class="request-btn" data-service="Arrangement and Orchestration">Request Arrangement</button>
         </div>
+
         <div class="service-card">
-          <h3>Transcriptions and Score Preparation</h3>
-          <p>Professional music transcription and engraving services. I can notate music by ear and prepare publication-ready scores and parts with meticulous attention to detail.</p>
-          <button class="request-btn" data-service="Transcriptions and Score Preparation">Request</button>
+          <h3>Transcriptions & Engraving</h3>
+          <p>Publication-ready engraving and transcription services. Accurate notation by ear and preparation of clean, professional scores and parts with fastidious detail.</p>
+          <button class="request-btn" data-service="Transcriptions and Score Preparation">Request Engraving</button>
         </div>
+
         <div class="service-card">
           <h3>Composition Lessons</h3>
-          <p>Private composition lessons for all levels and ages. I offer instruction in composition, orchestration, music theory, and analysis.</p>
-          <button class="request-btn" data-service="Composition Lessons">Request</button>
+          <p>Private composition, orchestration, counterpoint, and music theory lessons for all levels. Personalized mentorship designed around your creative goals.</p>
+          <button class="request-btn" data-service="Composition Lessons">Inquire Lessons</button>
         </div>
-        <div class="service-card info-card">
-          <h3>Useful Information for Requests</h3>
+
+        <div class="service-card">
+          <h3>Project Details to Include</h3>
           <ul>
-            <li>Instrumentation</li>
-            <li>Duration</li>
-            <li>Turnaround Time</li>
-            <li>Budget</li>
-            <li>Deliverables (Score, Parts, Audio)</li>
-            <li>File Formats (pdf, mp3, wav, sib, mscz, midi, musicxml)</li>
+            <li>Instrumentation & Voice Distribution</li>
+            <li>Target Duration (minutes)</li>
+            <li>Turnaround / Premiere Date</li>
+            <li>Project Budget Range</li>
+            <li>Deliverables (Score, Parts, Audio Mockup)</li>
+            <li>Desired Formats (PDF, Sibelius, MuseScore, MIDI)</li>
           </ul>
         </div>
-        <div class="service-card info-card">
+
+        <div class="service-card">
           <h3>What You Can Expect</h3>
           <ul>
-            <li>Quick turnaround (avg. 2-4 weeks)</li>
-            <li>Aesthetic Scores and Parts</li>
-            <li>Flexible Fees</li>
-            <li>Unlimited revisions</li>
+            <li>Prompt turnaround (average 2–4 weeks)</li>
+            <li>Publication-grade engraved scores & parts</li>
+            <li>Transparent, flexible fee structures</li>
+            <li>Collaborative revision process</li>
+            <li>Direct communication throughout</li>
           </ul>
-        </div>
-        <div class="service-card">
-          <p>To request a service or discuss a project, please <a href="mailto:dankimcomposer@gmail.com?subject=Service%20Request">email me</a> or use the contact options on the homepage.</p>
         </div>
       </div>
     </section>
-    <!-- Get a Quote Section -->
-    <section class="services-cards" style="margin-top:2.5em;display:flex;flex-direction:column;align-items:center;">
-      <div style="background:rgba(251,249,242,0.97);border-radius:14px;box-shadow:0 2px 12px rgba(120,92,82,0.10);padding:2.2em 2em 2em 2em;max-width:520px;width:100%;margin-bottom:2.5em;border:1.5px solid #785c52;">
-        <h2 style="margin-top:0;margin-bottom:0.7em;text-align:center;letter-spacing:0.5px;color:#785c52;">Get a Quote</h2>
-        <div style="display:flex;gap:1.2em;justify-content:center;align-items:end;margin-bottom:1.2em;flex-wrap:wrap;">
-          <div style="display:flex;flex-direction:column;align-items:center;">
-            <label for="quote-length" style="font-weight:500;margin-bottom:0.3em;color:#785c52;">Length (minutes)</label>
-            <input type="number" id="quote-length" min="1" step="1" value="1" style="width:80px;padding:0.3em 0.5em;border-radius:6px;border:1px solid #785c52;text-align:center;background:#fff;color:#785c52;">
+
+    <!-- Commission Workflow Diagram -->
+    <section id="workflow">
+      <h2>Commission Process</h2>
+      <p class="section-subtitle">How a Collaboration Unfolds</p>
+      <img src="pp_files/commission-diagram.jpeg" alt="Commission Process Diagram" class="commission-diagram">
+    </section>
+
+    <!-- Get a Quote Calculator -->
+    <section id="quote-section">
+      <h2>Fee Estimator</h2>
+      <p class="section-subtitle">Estimate Project Costs</p>
+
+      <div class="quote-calculator-card">
+        <h3>Commission Quote Estimator</h3>
+        <div class="quote-inputs-grid">
+          <div class="quote-input-group">
+            <label for="quote-length">Duration (minutes)</label>
+            <input type="number" id="quote-length" min="1" step="1" value="1" style="width:90px;">
           </div>
-          <div style="display:flex;flex-direction:column;align-items:center;">
-            <label for="quote-instruments" style="font-weight:500;margin-bottom:0.3em;color:#785c52;">Instruments</label>
-            <select id="quote-instruments" style="width:140px;padding:0.3em 0.5em;border-radius:6px;border:1px solid #785c52;background:#fff;color:#785c52;text-align:center;">
+          <div class="quote-input-group">
+            <label for="quote-instruments">Ensemble Size</label>
+            <select id="quote-instruments" style="min-width:160px;">
               <option value="1">Solo (1)</option>
               <option value="2">Duet (2)</option>
               <option value="3">Trio (3)</option>
@@ -97,190 +121,202 @@
               <option value="28">Orchestra Doubles (28)</option>
               <option value="35">Orchestra Triples (35)</option>
               <option value="40">Orchestra Quadruples (40)</option>
-              <option value="custom">Custom</option>
+              <option value="custom">Custom Ensemble</option>
             </select>
-            <input type="number" id="custom-instruments" min="1" step="1" value="5" style="width:80px;padding:0.3em 0.5em;border-radius:6px;border:1px solid #785c52;text-align:center;background:#fff;color:#785c52;margin-top:0.5em;display:none;" placeholder="Custom #">
+            <input type="number" id="custom-instruments" min="1" step="1" value="5" style="width:90px;margin-top:0.5rem;display:none;" placeholder="Custom #">
           </div>
-          <div style="display:flex;flex-direction:column;align-items:center;min-width:120px;">
-            <label for="discount-slider" style="font-weight:500;margin-bottom:0.3em;color:#785c52;">Discount (%)</label>
-            <div style="display:flex;align-items:center;gap:0.5em;">
-              <input type="range" id="discount-slider" min="0" max="75" step="5" value="0" style="width:90px;">
-              <span id="discount-value" style="color:#785c52;font-weight:bold;width:2.5em;display:inline-block;text-align:right;">0%</span>
+          <div class="quote-input-group">
+            <label for="discount-slider">Special Grant / Discount</label>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <input type="range" id="discount-slider" min="0" max="75" step="5" value="0" style="width:100px;">
+              <span id="discount-value" style="font-weight:600;min-width:2.5em;">0%</span>
             </div>
           </div>
         </div>
-        <div style="margin-top:0.7em;font-weight:bold;font-size:1.15em;text-align:center;background:#fff;border-radius:7px;padding:0.7em 0;color:#785c52;">
-          Estimated Fee: <span id="quote-result"><span style="color:#785c52;">$4.57</span></span>
+
+        <div class="quote-result-box">
+          Estimated Fee: <span id="quote-result">$4.57</span>
         </div>
-        <div style="font-size:0.88em;color:#785c52;text-align:center;margin-top:1.1em;font-style:italic;">
-          Note 1: This is only an estimate. All fees are negotiable and subject to project details.
-        </div>
-        <div id="note2-dynamic" style="font-size:0.88em;color:#785c52;margin-top:0.7em;text-align:center;font-style:italic;">
-          Note 2: The following rates are from the American Federation of Musicians' Ultra-Low Budget MP rate for 2025.
-        </div>
+
+        <p class="quote-note">Note 1: This estimate is a starting guideline. Fees are negotiable and tailored to project scope, timelines, and rights.</p>
+        <p id="note2-dynamic" class="quote-note">Note 2: Rate calculations reference the American Federation of Musicians (AFM) Ultra-Low Budget MP standard guidelines.</p>
       </div>
-      <div style="background:rgba(251,249,242,0.97);border-radius:12px;box-shadow:0 1px 8px rgba(120,92,82,0.08);padding:1.5em 1em 1.7em 1em;max-width:650px;width:100%;border:1.5px solid #785c52;">
-        <h3 style="margin-top:0;margin-bottom:1em;text-align:center;letter-spacing:0.2px;color:#785c52;">Standard Ensembles Rates</h3>
-        <table style="border-collapse:collapse;width:100%;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(120,92,82,0.07);color:#785c52;">
+
+      <!-- Standard Ensembles Table -->
+      <div style="max-width:650px;margin:2rem auto 0 auto;overflow-x:auto;">
+        <h3 style="text-align:center;font-family:var(--font-serif);color:var(--primary-dark);margin-bottom:1rem;">Standard Ensemble Rates per Minute</h3>
+        <table style="width:100%;border-collapse:collapse;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm);overflow:hidden;box-shadow:var(--shadow-subtle);">
           <thead>
-            <tr style="background:#f3e8de;">
-              <th style="border:1px solid #785c52;padding:8px 12px;font-weight:600;color:#785c52;">Description</th>
-              <th style="border:1px solid #785c52;padding:8px 12px;font-weight:600;color:#785c52;">Lines</th>
-              <th style="border:1px solid #785c52;padding:8px 12px;font-weight:600;color:#785c52;">Cost per Minute</th>
+            <tr style="background:var(--bg-elevated);color:var(--primary-dark);font-family:var(--font-serif);">
+              <th style="padding:10px 14px;text-align:left;border-bottom:1px solid var(--border-subtle);">Ensemble</th>
+              <th style="padding:10px 14px;text-align:center;border-bottom:1px solid var(--border-subtle);">Lines / Parts</th>
+              <th style="padding:10px 14px;text-align:right;border-bottom:1px solid var(--border-subtle);">Base Cost / Min</th>
             </tr>
           </thead>
           <tbody id="ensemble-table-body">
-            <!-- JS will fill this -->
+            <!-- Populated via JS -->
           </tbody>
         </table>
       </div>
     </section>
   </main>
-  <div id="request-modal" class="modal">
-    <div class="modal-content">
-      <span class="close-btn">&times;</span>
-      <h2>Service Request</h2>
+
+  <!-- Request Modal -->
+  <div id="request-modal" class="modal-bg">
+    <div class="modal-form">
+      <span class="modal-close close-btn">&times;</span>
+      <h3>Service Request</h3>
       <form id="request-form">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <label for="subject">Subject:</label>
+        <label for="name">Your Name</label>
+        <input type="text" id="name" name="name" required placeholder="Jane Doe">
+        <label for="email">Your Email</label>
+        <input type="email" id="email" name="email" required placeholder="jane@example.com">
+        <label for="subject">Service / Project</label>
         <input type="text" id="subject" name="subject" readonly>
-        <label for="message">Message:</label>
-        <textarea id="message" name="message" rows="5" required></textarea>
-        <button type="submit">Send Request</button>
+        <label for="message">Project Description & Timeline</label>
+        <textarea id="message" name="message" rows="5" required placeholder="Tell me about your project, instrumentation, target duration, and timeline..."></textarea>
+        <button type="submit" class="buy-btn" style="margin-top:1rem;">Send Request via Email</button>
       </form>
     </div>
   </div>
+
   <footer>
     <p id="copyright"></p>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var year = new Date().getFullYear();
-        var copyright = document.getElementById('copyright');
-        if (copyright) {
-          copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var year = new Date().getFullYear();
+      var copyright = document.getElementById('copyright');
+      if (copyright) {
+        copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+      }
+    });
+
+    // Modal logic
+    const modal = document.getElementById('request-modal');
+    const closeBtn = document.querySelector('.close-btn');
+    const requestBtns = document.querySelectorAll('.request-btn');
+    const subjectInput = document.getElementById('subject');
+    const form = document.getElementById('request-form');
+
+    requestBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const service = btn.getAttribute('data-service');
+        if (service) {
+          modal.classList.add('active');
+          subjectInput.value = service;
         }
       });
-    </script>
-  </footer>
-<script>
-// Modal logic
-const modal = document.getElementById('request-modal');
-const closeBtn = document.querySelector('.close-btn');
-const requestBtns = document.querySelectorAll('.request-btn');
-const subjectInput = document.getElementById('subject');
-const form = document.getElementById('request-form');
-
-requestBtns.forEach(btn => {
-  btn.addEventListener('click', () => {
-    modal.style.display = 'block';
-    subjectInput.value = btn.getAttribute('data-service');
-  });
-});
-closeBtn.onclick = function() {
-  modal.style.display = 'none';
-}
-window.onclick = function(event) {
-  if (event.target == modal) {
-    modal.style.display = 'none';
-  }
-}
-form.onsubmit = function(e) {
-  e.preventDefault();
-  const name = document.getElementById('name').value;
-  const email = document.getElementById('email').value;
-  const subject = document.getElementById('subject').value;
-  const message = document.getElementById('message').value;
-  window.location.href = `mailto:dankimcomposer@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + message)}`;
-  modal.style.display = 'none';
-  form.reset();
-}
-
-// --- Get a Quote Calculator ---
-let discountPercent = 0;
-function calculateQuote(instruments, length, useDiscount = true) {
-  const basePercent = 0.50;
-  let percent = basePercent;
-  if (useDiscount) {
-    percent = basePercent * (1 - discountPercent);
-  }
-  const fee = ((0.9147 * instruments + 14.934) * percent) * length;
-  return Math.round(fee * 100) / 100;
-}
-
-function updateQuote() {
-  let instruments;
-  const select = document.getElementById('quote-instruments');
-  if (select.value === 'custom') {
-    instruments = parseInt(document.getElementById('custom-instruments').value) || 1;
-  } else {
-    instruments = parseInt(select.value) || 1;
-  }
-  const length = parseInt(document.getElementById('quote-length').value) || 1;
-  let result = calculateQuote(instruments, length, true);
-  if (discountPercent > 0) {
-    let original = calculateQuote(instruments, length, false);
-    document.getElementById('quote-result').innerHTML = `<span style="text-decoration:line-through;color:#b33;font-weight:normal;">$${original.toFixed(2)}</span> <span style="color:#785c52;font-weight:bold;">$${result.toFixed(2)}</span>`;
-  } else {
-    document.getElementById('quote-result').innerHTML = `<span style="color:#785c52;font-weight:bold;">$${result.toFixed(2)}</span>`;
-  }
-  fillEnsembleTable();
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  const quoteInstruments = document.getElementById('quote-instruments');
-  if (quoteInstruments) {
-    quoteInstruments.addEventListener('change', function() {
-      const select = document.getElementById('quote-instruments');
-      const customInput = document.getElementById('custom-instruments');
-      if (select.value === 'custom') {
-        customInput.style.display = '';
-      } else {
-        customInput.style.display = 'none';
-      }
-      updateQuote();
     });
-    document.getElementById('custom-instruments').addEventListener('input', updateQuote);
-    document.getElementById('quote-length').addEventListener('input', updateQuote);
-    document.getElementById('discount-slider').addEventListener('input', function() {
-      discountPercent = parseInt(this.value) / 100;
-      document.getElementById('discount-value').textContent = this.value + '%';
-      updateQuote();
-    });
-    document.getElementById('discount-value').textContent = document.getElementById('discount-slider').value + '%';
-    fillEnsembleTable();
-  }
-});
 
-// --- Standard Ensembles Table ---
-const ensembles = [
-  { desc: 'Solo', lines: 1 },
-  { desc: 'Duet', lines: 2 },
-  { desc: 'Trio', lines: 3 },
-  { desc: 'Quartet', lines: 4 },
-  { desc: 'Orchestra Singles', lines: 16 },
-  { desc: 'Orchestra Doubles', lines: 28 },
-  { desc: 'Orchestra Triples', lines: 35 },
-  { desc: 'Orchestra Quadruples', lines: 40 }
-];
-function fillEnsembleTable() {
-  const tbody = document.getElementById('ensemble-table-body');
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  ensembles.forEach(e => {
-    const original = calculateQuote(e.lines, 1, false);
-    const discounted = calculateQuote(e.lines, 1, true);
-    let costCell = `$${original.toFixed(2)}`;
-    if (discountPercent > 0) {
-      costCell = `<span style=\"text-decoration:line-through;color:#b33;font-weight:normal;\">$${original.toFixed(2)}</span> <span style=\"color:#785c52;font-weight:bold;\">$${discounted.toFixed(2)}</span>`;
+    closeBtn.onclick = function() {
+      modal.classList.remove('active');
     }
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td style=\"border:1px solid #785c52;padding:6px 10px;\">${e.desc}</td><td style=\"border:1px solid #785c52;padding:6px 10px;\">${e.lines}</td><td style=\"border:1px solid #785c52;padding:6px 10px;\">${costCell}</td>`;
-    tbody.appendChild(tr);
-  });
-}
-</script>
+    window.onclick = function(event) {
+      if (event.target === modal) {
+        modal.classList.remove('active');
+      }
+    }
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const subject = document.getElementById('subject').value;
+      const message = document.getElementById('message').value;
+      window.location.href = `mailto:dankimcomposer@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('Name: ' + name + '\nEmail: ' + email + '\n\n' + message)}`;
+      modal.classList.remove('active');
+      form.reset();
+    }
+
+    // Quote Calculator
+    let discountPercent = 0;
+    function calculateQuote(instruments, length, useDiscount = true) {
+      const basePercent = 0.50;
+      let percent = basePercent;
+      if (useDiscount) {
+        percent = basePercent * (1 - discountPercent);
+      }
+      const fee = ((0.9147 * instruments + 14.934) * percent) * length;
+      return Math.round(fee * 100) / 100;
+    }
+
+    function updateQuote() {
+      let instruments;
+      const select = document.getElementById('quote-instruments');
+      if (select.value === 'custom') {
+        instruments = parseInt(document.getElementById('custom-instruments').value) || 1;
+      } else {
+        instruments = parseInt(select.value) || 1;
+      }
+      const length = parseInt(document.getElementById('quote-length').value) || 1;
+      let result = calculateQuote(instruments, length, true);
+      if (discountPercent > 0) {
+        let original = calculateQuote(instruments, length, false);
+        document.getElementById('quote-result').innerHTML = `<span style="text-decoration:line-through;color:var(--text-muted);font-weight:normal;margin-right:0.4rem;">$${original.toFixed(2)}</span> <span style="color:var(--primary-dark);font-weight:bold;">$${result.toFixed(2)}</span>`;
+      } else {
+        document.getElementById('quote-result').innerHTML = `<span style="color:var(--primary-dark);font-weight:bold;">$${result.toFixed(2)}</span>`;
+      }
+      fillEnsembleTable();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const quoteInstruments = document.getElementById('quote-instruments');
+      if (quoteInstruments) {
+        quoteInstruments.addEventListener('change', function() {
+          const select = document.getElementById('quote-instruments');
+          const customInput = document.getElementById('custom-instruments');
+          if (select.value === 'custom') {
+            customInput.style.display = '';
+          } else {
+            customInput.style.display = 'none';
+          }
+          updateQuote();
+        });
+        document.getElementById('custom-instruments').addEventListener('input', updateQuote);
+        document.getElementById('quote-length').addEventListener('input', updateQuote);
+        document.getElementById('discount-slider').addEventListener('input', function() {
+          discountPercent = parseInt(this.value) / 100;
+          document.getElementById('discount-value').textContent = this.value + '%';
+          updateQuote();
+        });
+        document.getElementById('discount-value').textContent = document.getElementById('discount-slider').value + '%';
+        fillEnsembleTable();
+      }
+    });
+
+    const ensembles = [
+      { desc: 'Solo', lines: 1 },
+      { desc: 'Duet', lines: 2 },
+      { desc: 'Trio', lines: 3 },
+      { desc: 'Quartet', lines: 4 },
+      { desc: 'Orchestra Singles', lines: 16 },
+      { desc: 'Orchestra Doubles', lines: 28 },
+      { desc: 'Orchestra Triples', lines: 35 },
+      { desc: 'Orchestra Quadruples', lines: 40 }
+    ];
+
+    function fillEnsembleTable() {
+      const tbody = document.getElementById('ensemble-table-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      ensembles.forEach(e => {
+        const original = calculateQuote(e.lines, 1, false);
+        const discounted = calculateQuote(e.lines, 1, true);
+        let costCell = `$${original.toFixed(2)}`;
+        if (discountPercent > 0) {
+          costCell = `<span style="text-decoration:line-through;color:var(--text-muted);font-weight:normal;margin-right:0.3rem;">$${original.toFixed(2)}</span> <span style="font-weight:600;color:var(--primary-dark);">$${discounted.toFixed(2)}</span>`;
+        }
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid var(--border-subtle)';
+        tr.innerHTML = `
+          <td style="padding:8px 14px;color:var(--text-primary);">${e.desc}</td>
+          <td style="padding:8px 14px;text-align:center;color:var(--text-secondary);">${e.lines}</td>
+          <td style="padding:8px 14px;text-align:right;color:var(--primary-dark);">${costCell}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+  </script>
 </body>
 </html>

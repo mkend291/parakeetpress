@@ -1,113 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <style>
-      .modal-bg {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(0,0,0,0.4);
-        z-index: 1000;
-        justify-content: center;
-        align-items: center;
-      }
-      .modal-bg.active { display: flex; }
-      .modal-form {
-        background: #fbf9f2;
-        border-radius: 16px;
-        padding: 2em 2em 1.5em 2em;
-        box-shadow: 0 4px 24px rgba(120,92,82,0.18);
-        min-width: 320px;
-        max-width: 95vw;
-      }
-      .modal-form label { display:block; margin-top:1em; font-weight:bold; }
-      .modal-form input, .modal-form textarea {
-        width: 100%;
-        margin-top: 0.3em;
-        margin-bottom: 0.7em;
-        padding: 0.5em;
-        border-radius: 8px;
-        border: 1px solid #ccc;
-        font-size: 1em;
-        font-family: inherit;
-      }
-      .modal-form button { margin-top: 1em; }
-      .modal-close { float:right; font-size:1.2em; cursor:pointer; color:#785c52; }
-    </style>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product Details | Parakeet Press</title>
+  <title>Score Details | Parakeet Press</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-        .video-responsive {
-          position: relative;
-          width: 100%;
-          padding-bottom: 56.25%; /* 16:9 aspect ratio */
-          height: 0;
-          margin: 1.5em 0;
-        }
-        .video-responsive iframe {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          border: 0;
-        }
-    .product-detail-full {
-      width: 100%;
-      max-width: 900px;
-      margin: 2em auto;
-      background: rgba(251, 249, 242, 0.95);
-      border-radius: 18px;
-      box-shadow: 0 4px 16px rgba(120, 92, 82, 0.10);
-      border: 1.5px solid #785c52;
-      padding: 2.5em 2em;
-      display: block;
-      box-sizing: border-box;
-    }
-    @media (max-width: 600px) {
-      .product-detail-full {
-        padding: 1.2em 0.5em;
-      }
-    }
-    .product-detail-full h2 {
-      font-size: 2em;
-      margin-bottom: 0.5em;
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-  <header>
-    <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" style="height:48px;vertical-align:middle;margin-right:12px;border-radius:12px;">
-    <a href="index.html" style="text-decoration:none;color:inherit;"><h1 style="display:inline;vertical-align:middle;">PARAKEET PRESS</h1></a>
-    <div style="margin-bottom:8px;"></div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="services.html">Services</a>
-      <a href="store.html">Store</a>
-      <a href="chirp.html">Chirp!</a>
-    </nav>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo-link">
+        <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" class="logo-img">
+        <span class="logo-text">Parakeet Press</span>
+      </a>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
+          <li><a href="store.html" class="nav-link active">Store</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
+
   <main>
-    <section id="product-detail" style="margin-top:2em;">
-      <a href="store.html" id="back-to-store" class="buy-btn" style="display:inline-block;margin-bottom:1.2em;padding:0.5em 1.5em;font-size:1em;">&larr; Back to Store</a>
-      <div id="product-detail-card"></div>
+    <section id="product-detail-section">
+      <div style="margin-bottom: 1.5rem;">
+        <a href="store.html" id="back-to-store" class="pagination-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
+          &larr; Back to Catalog
+        </a>
+      </div>
+      <div id="product-detail-card">
+        <p style="text-align:center;color:var(--text-secondary);">Loading score details...</p>
+      </div>
     </section>
   </main>
+
   <footer>
     <p id="copyright"></p>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var year = new Date().getFullYear();
-        var copyright = document.getElementById('copyright');
-        if (copyright) {
-          copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
-        }
-      });
-    </script>
   </footer>
+
   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var year = new Date().getFullYear();
+      var copyright = document.getElementById('copyright');
+      if (copyright) {
+        copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+      }
+    });
+
     // Robust CSV parser for quoted fields
     function parseCSV(text) {
       const lines = text.trim().split('\n');
@@ -129,10 +71,11 @@
         }
         values.push(current);
         const obj = {};
-        headers.forEach((h, i) => obj[h.trim()] = (i < values.length && values[i] !== undefined) ? values[i].trim() : '');
+        headers.forEach((h, i) => obj[h.trim()] = values[i] ? values[i].trim() : '');
         return obj;
       });
     }
+
     function getId() {
       const params = new URLSearchParams(window.location.search);
       return params.get('id');
@@ -142,13 +85,13 @@
       const params = new URLSearchParams(window.location.search);
       return params.get('page');
     }
+
     function renderProduct(p) {
-            // Dynamically generate possible cover image filenames
-            const safeTitle = (p.title || '').trim();
-            const imgJpg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpg`;
-            const imgJpeg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpeg`;
-            // Try .jpg first, then .jpeg if .jpg fails
-            let imgTag = `<img src="${imgJpg}" alt="${safeTitle} cover" class="cover-img-full" style="display:block;margin:0.5em auto 1.2em auto;" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.style.display='none';}">`;
+      const safeTitle = (p.title || '').trim();
+      const imgJpg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpg`;
+      const imgJpeg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpeg`;
+      let imgTag = `<img src="${imgJpg}" alt="${safeTitle} cover" class="cover-img-full" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.style.display='none';}">`;
+
       let videoEmbed = '';
       if (p.videoLink && p.videoLink.startsWith('http')) {
         let vidId = '';
@@ -159,30 +102,30 @@
           vidId = p.videoLink.split('youtu.be/')[1];
         }
         if (vidId) {
-          videoEmbed = `<div class="video-responsive"><iframe src="https://www.youtube.com/embed/${vidId}" allowfullscreen></iframe></div>`;
+          videoEmbed = `<div class="video-responsive"><iframe src="https://www.youtube.com/embed/${vidId}" title="${safeTitle} Performance Video" allowfullscreen></iframe></div>`;
         }
       }
-      // Fallbacks for blank fields
+
       function hideIfNA(val) {
         return val && val.trim().toLowerCase() !== 'n/a' ? val.trim() : '';
       }
-      const title = hideIfNA(p.title) || 'Untitled';
+
+      const title = hideIfNA(p.title) || 'Untitled Work';
       const instrumentation = hideIfNA(p.instrumentation);
       const year = hideIfNA(p.year);
       const duration = hideIfNA(p.duration);
       const info = hideIfNA(p.info);
-      let buyBtn = '';
-      const btnText = (p.buyMethod && p.buyMethod.trim()) ? p.buyMethod : 'Buy Score';
-      // Always show Contact Daniel button
-      buyBtn = `<button class="buy-btn secondary-btn" type="button" id="open-email-modal">Contact Daniel</button>`;
+
+      let buyBtn = `<button class="buy-btn secondary-btn" type="button" id="open-email-modal">Contact Daniel to Order Direct</button>`;
       const buyLink = hideIfNA(p.buyLink);
+      const btnText = (p.buyMethod && p.buyMethod.trim()) ? p.buyMethod : 'Buy Score via Vendor';
+
       const multiplePartsRaw = p.multipleParts ? p.multipleParts.trim() : '';
       let multiPartsBlock = '';
       let isMultiplePartsCSV = multiplePartsRaw && multiplePartsRaw.match(/\.csv$/i);
-      let isMultipleParts = !!isMultiplePartsCSV;
+
       if (isMultiplePartsCSV) {
-        // Show loading message, then fetch and parse CSV
-        multiPartsBlock = `<div id="multi-parts-block" style="margin-bottom:1em;">Loading instrument purchase links...</div>`;
+        multiPartsBlock = `<div id="multi-parts-block" class="multi-parts-container"><p style="color:var(--text-secondary);margin:0;">Loading instrument arrangement links...</p></div>`;
         setTimeout(() => {
           fetch('pp_files/pp_store/solo-arr-catalogue.csv')
             .then(res => res.text())
@@ -190,18 +133,18 @@
               const rows = parseCSV(csvText);
               const row = rows.find(r => (r.Title || r.title || '').trim().toLowerCase() === title.trim().toLowerCase());
               if (!row) {
-                document.getElementById('multi-parts-block').innerHTML = '<span style="color:#a00;">No instrument links found for this title.</span>';
+                document.getElementById('multi-parts-block').innerHTML = '<span style="color:#b33;">No instrument links found for this title.</span>';
                 return;
               }
-              let html = `<div style=\"margin-bottom:0.5em;font-weight:bold;\">Purchase Links by Instrument:</div><div style=\"margin-bottom:1em;\">`;
+              let html = `<div class="multi-parts-title">Available Instrumentation Editions:</div><div class="multi-parts-grid">`;
               Object.keys(row).forEach(col => {
                 if (col.toLowerCase() === 'title') return;
                 const val = row[col];
                 if (val && val.trim().toLowerCase() !== 'n/a') {
                   if (/^https?:\/\//.test(val)) {
-                    html += `<span style=\"white-space:nowrap;display:inline-block;margin-right:1.2em;\"><a href=\"${val}\" target=\"_blank\" class=\"buy-btn\" style=\"padding:0.4em 1em;margin:0 0.2em 0.5em 0;display:inline-block;\">${col}</a></span>`;
+                    html += `<a href="${val}" target="_blank" rel="noopener" class="instrument-pill">${col} &rarr;</a>`;
                   } else {
-                    html += `<span style=\"color:#785c52;background:#eee;border-radius:8px;padding:0.4em 1em;margin:0 0.2em 0.5em 0;display:inline-block;opacity:0.7;cursor:not-allowed;\">${col}</span>`;
+                    html += `<span class="instrument-pill" style="opacity:0.5;cursor:not-allowed;">${col}</span>`;
                   }
                 }
               });
@@ -209,27 +152,22 @@
               document.getElementById('multi-parts-block').innerHTML = html;
             })
             .catch(() => {
-              document.getElementById('multi-parts-block').innerHTML = '<span style="color:#a00;">Error loading instrument links.</span>';
+              document.getElementById('multi-parts-block').innerHTML = '<span style="color:#b33;">Error loading instrument catalogue.</span>';
             });
         }, 0);
       } else if (buyLink) {
-        buyBtn += ` <a class="buy-btn" href="${buyLink}" target="_blank">${btnText}</a>`;
+        buyBtn += ` <a class="buy-btn" href="${buyLink}" target="_blank" rel="noopener">${btnText}</a>`;
       }
+
       let price = '';
       if (p.price && hideIfNA(p.price)) {
-        // Try to extract a number from the price string
         const priceNum = parseFloat(p.price.replace(/[^\d.]/g, ''));
-        if (!isNaN(priceNum)) {
-          price = `$${priceNum.toFixed(2)}`;
-        } else {
-          price = p.price.trim();
-        }
+        price = !isNaN(priceNum) ? `$${priceNum.toFixed(2)}` : p.price.trim();
       }
-      const priceNotes = p.priceNotes && hideIfNA(p.priceNotes) ? `<div style='margin:0.2em 0 0.7em 0;font-style:italic;color:#555;'>${p.priceNotes}</div>` : '';
+
       let directPrice = p.directPrice && hideIfNA(p.directPrice) ? p.directPrice : '';
       let percentOff = '';
       if (price && directPrice) {
-        // Remove $ and commas, parse as float
         const vendorNum = parseFloat(price.replace(/[^\d.]/g, ''));
         const directNum = parseFloat(directPrice.replace(/[^\d.]/g, ''));
         if (isFinite(vendorNum) && isFinite(directNum) && vendorNum > 0 && directNum < vendorNum) {
@@ -238,116 +176,72 @@
         }
       }
       if (directPrice && !directPrice.startsWith('$')) directPrice = `$${directPrice}`;
+
       return `
         <div class="product-detail-full">
-          <h2 style="margin-top:0;">${title}</h2>
+          <h2>${title}</h2>
           ${imgTag}
           ${videoEmbed}
-          ${instrumentation ? `<p><strong>Instrumentation:</strong> ${instrumentation}</p>` : ''}
-          ${duration ? `<p><strong>Duration:</strong> ${duration} min</p>` : ''}
-          ${year ? `<p><strong>Year:</strong> ${year}</p>` : ''}
-            ${info ? `<p><strong>Info:</strong> ${info}</p>` : ''}
-          ${price ? `<div style="margin:1.2em 0 0.2em 0;font-weight:bold;">Vendor Price: <span style='font-weight:normal;'>${price}</span></div>` : ''}
-          ${priceNotes}
-          ${directPrice ? `<div style=\"margin:0.2em 0 0.7em 0;font-weight:bold;\">Direct Price: <span style='font-weight:normal;'><span style='text-decoration:line-through;margin-right:0.5em;'>${price}</span><span style='color:#a55;'>${directPrice}${percentOff}</span></span></div>` : ''}
-            <!-- Total Sold placeholder (value to be filled later) -->
-            <div id="total-sold" style="margin:0.4em 0 0.4em 0;font-weight:bold;">Total Sold: <span id="total-sold-value" style="font-weight:normal;"></span></div>
-          <div style="margin:0.5em 0 0.5em 0;font-weight:bold;">Purchase Options:</div>
-          ${multiPartsBlock}
-          ${isMultipleParts ? '<div style="margin:0.5em 0 0.5em 3.5em;font-weight:bold;">or</div>' : ''}
-          ${buyBtn}
-          <div style="margin-top:0.7em;font-size:0.98em;color:#785c52;background:rgba(251,249,242,0.7);border-radius:8px;padding:0.7em 1em 0.7em 1em;max-width:480px;">
-            <span style="font-weight:bold;">Save up to 50% by purchasing directly from Daniel.</span> ArrangeMe (vendor) regulates the minimum price for each piece and takes a significant portion of each purchase. Buying direct saves you from paying the vendor's portion while also allowing me to receive more of your support. Please request the music via email, and I will send you the score. After payment, I will send the parts. 
+
+          <div class="detail-specs">
+            ${instrumentation ? `<p><strong>Instrumentation:</strong> ${instrumentation}</p>` : ''}
+            ${duration ? `<p><strong>Duration:</strong> ${duration} min</p>` : ''}
+            ${year ? `<p><strong>Year:</strong> ${year}</p>` : ''}
+            ${info ? `<p style="margin-top:0.4rem;line-height:1.7;"><strong>Description:</strong> ${info}</p>` : ''}
+            ${price ? `<p><strong>Publisher / Vendor Price:</strong> ${price}</p>` : ''}
+            ${directPrice ? `
+              <p><strong>Direct Composer Price:</strong> <span style="text-decoration:line-through;color:var(--text-muted);margin-right:0.4rem;">${price}</span><span style="color:var(--primary-dark);font-weight:bold;">${directPrice}${percentOff}</span></p>
+            ` : ''}
+            <p id="total-sold" style="display:none;"><strong>Total Distributed:</strong> <span id="total-sold-value"></span></p>
           </div>
-          <!-- Commission diagram: responsive and constrained to container -->
-          <div style="margin-top:1em;text-align:center;">
-            <img src="pp_files/commission-diagram.jpeg" alt="Commission diagram" class="commission-diagram" loading="lazy">
+
+          ${multiPartsBlock}
+
+          <div class="detail-actions">
+            ${buyBtn}
+          </div>
+
+          <div style="margin-top:1.8rem;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1rem 1.4rem;font-size:0.95rem;color:var(--text-secondary);line-height:1.6;">
+            <strong style="color:var(--primary-dark);">Purchasing Direct from Daniel:</strong> Third-party sheet music distributors set high price minimums and take up to 90% of royalties. Ordering directly supports the composer and provides you with personalized engraving, score preparation, and custom transpositions if needed.
           </div>
         </div>
+
+        <!-- Contact Email Modal -->
         <div class="modal-bg" id="email-modal">
-          <form class="modal-form" id="email-form" onsubmit="return false;">
+          <div class="modal-form">
             <span class="modal-close" id="close-email-modal">&times;</span>
-            <h3>Contact to Buy Score</h3>
-            <div style="margin-bottom:0.7em;font-size:0.98em;color:#785c52;"><strong>To:</strong> dankimcomposer@gmail.com</div>
-            <label for="yourName">Your Name</label>
-            <input type="text" id="yourName" name="yourName" required>
-            <label for="yourEmail">Your Email</label>
-            <input type="email" id="yourEmail" name="yourEmail" required>
-            <label for="yourSubject">Subject</label>
-            <input type="text" id="yourSubject" name="yourSubject" value="Score Purchase Inquiry: ${title}" required>
-            <label for="yourMsg">Message</label>
-            <textarea id="yourMsg" name="yourMsg" rows="4">Hello,\n\nI am interested in purchasing the score for \"${title}\".\n\nThank you!</textarea>
-            <button type="submit" class="buy-btn">Send Email</button>
-          </form>
+            <h3>Direct Score Order</h3>
+            <form id="email-form" onsubmit="return false;">
+              <label for="yourName">Your Name</label>
+              <input type="text" id="yourName" name="yourName" required placeholder="Jane Doe">
+              <label for="yourEmail">Your Email</label>
+              <input type="email" id="yourEmail" name="yourEmail" required placeholder="jane@example.com">
+              <label for="yourSubject">Subject</label>
+              <input type="text" id="yourSubject" name="yourSubject" value="Score Purchase Inquiry: ${title}" required>
+              <label for="yourMsg">Message</label>
+              <textarea id="yourMsg" name="yourMsg" rows="4">Hello,\n\nI would like to purchase the score and parts for \"${title}\".\n\nThank you!</textarea>
+              <button type="submit" class="buy-btn" style="margin-top:1rem;">Send Order Request</button>
+            </form>
+          </div>
         </div>
       `;
-            // Cover image modal logic
-            setTimeout(function() {
-              var img = document.getElementById('cover-img-half');
-              var modal = document.getElementById('cover-modal');
-              var modalInner = document.getElementById('cover-modal-inner');
-              var modalImg = document.getElementById('cover-modal-img');
-              if (img && modal && modalImg) {
-                img.onclick = function() {
-                  modalImg.src = img.src;
-                  modalImg.alt = img.alt;
-                  modal.style.display = 'block';
-                };
-                img.onkeydown = function(e) {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    img.onclick();
-                  }
-                };
-                // Close modal when clicking outside the image
-                modal.onclick = function(e) {
-                  if (e.target === modal || e.target === modalInner) {
-                    modal.style.display = 'none';
-                  }
-                };
-              }
-            }, 0);
-        // Email modal logic
-        document.addEventListener('click', function(e) {
-          if (e.target && e.target.id === 'open-email-modal') {
-            document.getElementById('email-modal').classList.add('active');
-          }
-          if (e.target && e.target.id === 'close-email-modal') {
-            document.getElementById('email-modal').classList.remove('active');
-          }
-        });
-        document.addEventListener('submit', function(e) {
-          if (e.target && e.target.id === 'email-form') {
-            const name = document.getElementById('yourName').value;
-            const email = document.getElementById('yourEmail').value;
-            let msg = document.getElementById('yourMsg').value;
-            const subject = encodeURIComponent(`Score Purchase Inquiry: ${document.querySelector('.product-detail-full h2').textContent}`);
-            msg = `Name: ${name}\nEmail: ${email}\n\n${msg}`;
-            const body = encodeURIComponent(msg);
-            // Always send to dankimcomposer@gmail.com
-            const emailAddr = 'dankimcomposer@gmail.com';
-            window.location.href = `mailto:${emailAddr}?subject=${subject}&body=${body}`;
-            document.getElementById('email-modal').classList.remove('active');
-          }
-        });
     }
+
     const card = document.getElementById('product-detail-card');
     function showError(msg) {
-
-      card.innerHTML = `<div class="not-available">${msg}</div>`;
+      card.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text-muted);">${msg}</div>`;
     }
+
     function fetchSalesCount(productTitle) {
       function normalize(value) {
         return (value || '').trim().toLowerCase();
       }
-
       function baseWithoutParen(title) {
         return normalize((title || '').replace(/\([^)]*\)/g, '').trim());
       }
-
       function containsAndPiano(title) {
         return /(?:\band\s+piano\b|&\s*piano\b)/i.test(title || '');
       }
-
       function baseFromSalesPianoTitle(title) {
         const withoutPianoParen = (title || '').replace(/\([^)]*(?:and|&)\s*piano[^)]*\)/i, '').trim();
         return baseWithoutParen(withoutPianoParen);
@@ -357,141 +251,105 @@
         fetch('pp_files/pp_store/ArrangeMe_Sales_Report.csv').then(res => res.text()),
         fetch('pp_files/pp_store/solo-arr-catalogue.csv').then(res => res.text())
       ])
-        .then(([salesText, soloText]) => {
-          const salesRows = parseCSV(salesText);
-          const soloRows = parseCSV(soloText);
-          const productTitleNormalized = normalize(productTitle);
+      .then(([salesText, soloText]) => {
+        const salesRows = parseCSV(salesText);
+        const soloRows = parseCSV(soloText);
+        const productTitleNormalized = normalize(productTitle);
+        const soloTitles = soloRows.map(row => (row.Title || row.title || '').trim()).filter(Boolean);
 
-          const soloTitles = soloRows
-            .map(row => (row.Title || row.title || '').trim())
-            .filter(Boolean);
-
-          function mapSalesTitleToScoreTitle(salesTitle) {
-            const salesTitleNormalized = normalize(salesTitle);
-            const directSoloMatch = soloTitles.find(title => normalize(title) === salesTitleNormalized);
-            if (directSoloMatch) {
-              return normalize(directSoloMatch);
-            }
-
-            if (containsAndPiano(salesTitle)) {
-              const salesBase = baseFromSalesPianoTitle(salesTitle);
-              const mappedSolo = soloTitles.find(title => baseWithoutParen(title) === salesBase);
-              if (mappedSolo) {
-                return normalize(mappedSolo);
-              }
-            }
-
-            return salesTitleNormalized;
+        function mapSalesTitleToScoreTitle(salesTitle) {
+          const salesTitleNormalized = normalize(salesTitle);
+          const directSoloMatch = soloTitles.find(t => normalize(t) === salesTitleNormalized);
+          if (directSoloMatch) return normalize(directSoloMatch);
+          if (containsAndPiano(salesTitle)) {
+            const salesBase = baseFromSalesPianoTitle(salesTitle);
+            const mappedSolo = soloTitles.find(t => baseWithoutParen(t) === salesBase);
+            if (mappedSolo) return normalize(mappedSolo);
           }
+          return salesTitleNormalized;
+        }
 
-          let count = 0;
-          salesRows.forEach(row => {
-            const txType = normalize(row['Transaction Type'] || row['transaction type']);
-            if (txType !== 'purchase') {
-              return;
-            }
-
-            const salesTitle = (row.Title || row.title || '').trim();
-            const mappedTitle = mapSalesTitleToScoreTitle(salesTitle);
-            if (mappedTitle === productTitleNormalized) {
-              count++;
-            }
-          });
-
-          return count;
-        })
-        .catch(e => {
-          console.error('Error fetching sales data:', e);
-          return 0;
+        let count = 0;
+        salesRows.forEach(row => {
+          const txType = normalize(row['Transaction Type'] || row['transaction type']);
+          if (txType !== 'purchase') return;
+          const salesTitle = (row.Title || row.title || '').trim();
+          if (mapSalesTitleToScoreTitle(salesTitle) === productTitleNormalized) {
+            count++;
+          }
         });
+        return count;
+      })
+      .catch(() => 0);
     }
+
     fetch('pp_files/pp_store/scoresShop.csv')
       .then(res => {
-        if (!res.ok) {
-          showError('Error loading product data.');
-          throw new Error('Network error');
-        }
+        if (!res.ok) throw new Error('Network error');
         return res.text();
       })
       .then(text => {
-        let products;
-        try {
-          products = parseCSV(text);
-        } catch (e) {
-          showError('Error parsing product data.');
-          throw e;
-        }
+        const products = parseCSV(text);
         const rawId = getId();
         if (!rawId) {
-          showError('No product specified.');
+          showError('No score selected. Please return to the store catalog.');
           return;
         }
         const decodedId = decodeURIComponent(rawId).replace(/\+/g, ' ').trim();
         const p = products.find(prod => (prod.id || '').trim() === decodedId);
         if (!p) {
-          showError('Product not found.');
+          showError('Score not found in catalog.');
           return;
         }
-        try {
-          card.innerHTML = renderProduct(p);
-          // Fetch sales count and update Total Sold if > 0
-          fetchSalesCount(p.title).then(count => {
-            const totalSoldDiv = document.getElementById('total-sold');
-            const totalSoldValue = document.getElementById('total-sold-value');
-            if (count > 0) {
-              totalSoldValue.textContent = count;
-            } else {
-              // Hide Total Sold if count is 0
-              if (totalSoldDiv) {
-                totalSoldDiv.style.display = 'none';
-              }
-            }
-          });
-          // Attach modal event listeners after rendering
-          setTimeout(() => {
-            const openBtn = document.getElementById('open-email-modal');
-            const closeBtn = document.getElementById('close-email-modal');
-            const modal = document.getElementById('email-modal');
-            const form = document.getElementById('email-form');
-            if (openBtn && modal) {
-              openBtn.onclick = () => { modal.classList.add('active'); };
-            }
-            if (closeBtn && modal) {
-              closeBtn.onclick = () => { modal.classList.remove('active'); };
-            }
-            if (form) {
-              form.onsubmit = function() {
-                const name = document.getElementById('yourName').value;
-                const email = document.getElementById('yourEmail').value;
-                const subjectRaw = document.getElementById('yourSubject').value;
-                let msg = document.getElementById('yourMsg').value;
-                msg = `Name: ${name}\nEmail: ${email}\n\n${msg}`;
-                const subject = encodeURIComponent(subjectRaw);
-                const body = encodeURIComponent(msg);
-                // Always send to dankimcomposer@gmail.com
-                const emailAddr = 'dankimcomposer@gmail.com';
-                window.location.href = `mailto:${emailAddr}?subject=${subject}&body=${body}`;
-                modal.classList.remove('active');
-                return false;
-              };
-            }
-          }, 0);
-          // Update Back link to restore store page if `page` was provided
-          try {
-            const pageParam = getPage();
-            const back = document.getElementById('back-to-store');
-            if (back) {
-              back.href = 'store.html' + (pageParam ? ('?page=' + encodeURIComponent(pageParam)) : '');
-            }
-          } catch (e) {
-            // ignore
+
+        card.innerHTML = renderProduct(p);
+
+        fetchSalesCount(p.title).then(count => {
+          const totalSoldDiv = document.getElementById('total-sold');
+          const totalSoldValue = document.getElementById('total-sold-value');
+          if (count > 0 && totalSoldDiv && totalSoldValue) {
+            totalSoldValue.textContent = count;
+            totalSoldDiv.style.display = 'block';
           }
-        } catch (e) {
-          showError('Error displaying product details.');
-        }
+        });
+
+        setTimeout(() => {
+          const openBtn = document.getElementById('open-email-modal');
+          const closeBtn = document.getElementById('close-email-modal');
+          const modal = document.getElementById('email-modal');
+          const form = document.getElementById('email-form');
+          if (openBtn && modal) {
+            openBtn.onclick = () => { modal.classList.add('active'); };
+          }
+          if (closeBtn && modal) {
+            closeBtn.onclick = () => { modal.classList.remove('active'); };
+          }
+          if (form) {
+            form.onsubmit = function() {
+              const name = document.getElementById('yourName').value;
+              const email = document.getElementById('yourEmail').value;
+              const subjectRaw = document.getElementById('yourSubject').value;
+              let msg = document.getElementById('yourMsg').value;
+              msg = `Name: ${name}\nEmail: ${email}\n\n${msg}`;
+              const subject = encodeURIComponent(subjectRaw);
+              const body = encodeURIComponent(msg);
+              window.location.href = `mailto:dankimcomposer@gmail.com?subject=${subject}&body=${body}`;
+              modal.classList.remove('active');
+              return false;
+            };
+          }
+        }, 0);
+
+        try {
+          const pageParam = getPage();
+          const back = document.getElementById('back-to-store');
+          if (back && pageParam) {
+            back.href = 'store.html?page=' + encodeURIComponent(pageParam);
+          }
+        } catch (e) {}
       })
-      .catch(e => {
-        if (!card.innerHTML) showError('Unexpected error loading product.');
+      .catch(() => {
+        showError('Unable to load score details.');
       });
   </script>
 </body>

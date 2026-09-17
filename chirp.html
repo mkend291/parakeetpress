@@ -3,122 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Support Parakeet Press | Chirp!</title>
+  <title>Avian Inspiration | Parakeet Press</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-        .birds-section {
-          max-width: 700px;
-          margin: 2.5em auto 2em auto;
-          text-align: center;
-          background: rgba(255, 245, 220, 0.45);
-          border-radius: 22px;
-          box-shadow: 0 2px 12px rgba(120,92,82,0.08);
-          padding: 2em 1em 1.5em 1em;
-        }
-        .birds-gallery {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: 2em;
-          margin-top: 1em;
-        }
-        .bird-pic-frame {
-          background: #fffbe9;
-          border-radius: 18px;
-          box-shadow: 0 2px 8px rgba(120,92,82,0.10);
-          padding: 0.7em;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: auto;
-          transition: transform 0.15s;
-        }
-        .bird-pic-frame:hover {
-          transform: scale(1.04) rotate(-1deg);
-          box-shadow: 0 6px 18px rgba(120,92,82,0.16);
-        }
-        .bird-pic-frame img {
-          max-width: 180px;
-          max-height: 180px;
-          border-radius: 14px;
-          border: 2.5px solid #ffe066;
-          background: #fff;
-          margin-bottom: 0;
-          object-fit: contain;
-        }
-    .donate-container {
-      max-width: 480px;
-      margin: 3em auto;
-      background: rgba(251, 249, 242, 0.97);
-      border-radius: 18px;
-      box-shadow: 0 4px 16px rgba(120, 92, 82, 0.10);
-      border: 1.5px solid #785c52;
-      padding: 2.5em 2em;
+    .birds-section {
+      max-width: 750px;
+      margin: 2rem auto;
       text-align: center;
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      border: 1px solid var(--border-subtle);
+      padding: 2.5rem 2rem;
     }
-    .donate-btn {
-      background: #ffdd00;
-      color: #222;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      padding: 1em 2em;
-      font-size: 1.2em;
-      margin-top: 2em;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(120,92,82,0.08);
-      transition: background 0.2s;
+    .birds-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.8rem;
+      margin-top: 1.8rem;
     }
-    .donate-btn:hover {
-      background: #ffe866;
+    .bird-pic-frame {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .bird-pic-frame:hover {
+      transform: translateY(-4px) rotate(-1deg);
+      box-shadow: var(--shadow-hover);
+    }
+    .bird-pic-frame img {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: var(--radius-sm);
+      background: #fff;
+      object-fit: cover;
     }
   </style>
 </head>
 <body>
-  <header>
-    <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" style="height:48px;vertical-align:middle;margin-right:12px;border-radius:12px;">
-    <a href="index.html" style="text-decoration:none;color:inherit;"><h1 style="display:inline;vertical-align:middle;">PARAKEET PRESS</h1></a>
-    <div style="margin-bottom:8px;"></div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="services.html">Services</a>
-      <a href="store.html">Store</a>
-      <a href="chirp.html">Chirp!</a>
-    </nav>
-  </header>
-  <main>
-    <div class="donate-container">
-      <h2>Help Feed the Birds!</h2>
-      <p>If you enjoyed my music, services, or resources, please consider leaving a tip! Your support helps me create more music and share it with the community. Thank you for listening and supporting Parakeet Press!</p>
-      <a href="https://buymeacoffee.com/dankim291" target="_blank" rel="noopener">
-        <button class="donate-btn">Leave a Tip</button>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo-link">
+        <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" class="logo-img">
+        <span class="logo-text">Parakeet Press</span>
       </a>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
+          <li><a href="store.html" class="nav-link">Store</a></li>
+        </ul>
+      </nav>
     </div>
+  </header>
+
+  <main>
     <div class="birds-section">
+      <h2>The Parakeets of Parakeet Press</h2>
+      <p class="section-subtitle">Musical Inspiration & Studio Companions</p>
+      <p style="line-height:1.7;color:var(--text-primary);max-width:600px;margin:0 auto 1.5rem auto;">
+        Parakeet Press was named in honor of our feathered companions whose cheerful morning chirps and playful personalities bring endless warmth to the composing studio.
+      </p>
       <div class="birds-gallery">
         <div class="bird-pic-frame">
-          <img src="pp_files/PP_Birds1.jpg" alt="Bird 1">
+          <img src="pp_files/PP_Birds1.jpg" alt="Parakeet companion 1">
         </div>
         <div class="bird-pic-frame">
-          <img src="pp_files/PP_Birds2.JPG" alt="Bird 2">
+          <img src="pp_files/PP_Birds2.JPG" alt="Parakeet companion 2">
         </div>
         <div class="bird-pic-frame">
-          <img src="pp_files/PP_Birds3.jpg" alt="Bird 3">
+          <img src="pp_files/PP_Birds3.jpg" alt="Parakeet companion 3">
         </div>
+      </div>
+      <div style="margin-top:2rem;">
+        <a href="store.html" class="buy-btn" style="width:auto;display:inline-block;padding:0.6rem 1.8rem;">Explore the Sheet Music Catalog &rarr;</a>
       </div>
     </div>
   </main>
+
   <footer>
     <p id="copyright"></p>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var year = new Date().getFullYear();
-        var copyright = document.getElementById('copyright');
-        if (copyright) {
-          copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
-        }
-      });
-    </script>
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var year = new Date().getFullYear();
+      var copyright = document.getElementById('copyright');
+      if (copyright) {
+        copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+      }
+    });
+  </script>
 </body>
 </html>
