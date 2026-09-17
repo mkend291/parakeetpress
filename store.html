@@ -3,53 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Store | Parakeet Press</title>
+  <title>Sheet Music Store | Parakeet Press</title>
   <link rel="stylesheet" href="style.css">
-
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
-  <header>
-    <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" style="height:48px;vertical-align:middle;margin-right:12px;border-radius:12px;">
-    <a href="index.html" style="text-decoration:none;color:inherit;"><h1 style="display:inline;vertical-align:middle;">PARAKEET PRESS</h1></a>
-    <div style="margin-bottom:8px;"></div>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="services.html">Services</a>
-      <a href="store.html">Store</a>
-      <a href="chirp.html">Chirp!</a>
-    </nav>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo-link">
+        <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" class="logo-img">
+        <span class="logo-text">Parakeet Press</span>
+      </a>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
+          <li><a href="store.html" class="nav-link active">Store</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
+
   <main>
-    <section id="store" style="margin-top:2em;">
-      <h2>Store</h2>
-      <div style="text-align:center;margin-bottom:1.5em;display:flex;gap:0.6em;justify-content:center;align-items:center;flex-wrap:wrap;">
-        <input id="store-search" type="text" placeholder="Search by title, instrument, or year..." style="width:320px;max-width:40vw;padding:0.6em 1em;border-radius:10px;border:1.5px solid #785c52;font-size:1em;">
-        <select id="type-filter" style="padding:0.55em 0.9em;border-radius:10px;border:1.5px solid #785c52;background:#fff;font-size:0.95em;">
-          <option value="all">Show all</option>
-          <option value="originals">Originals only</option>
-          <option value="arrangements">Arrangements only</option>
+    <section id="store">
+      <h2>Sheet Music Catalog</h2>
+      <p class="section-subtitle">Scores, Solo Arrangements & Ensemble Music</p>
+
+      <div class="store-toolbar">
+        <input id="store-search" class="store-search-input" type="text" placeholder="Search by title, instrument, year...">
+        <select id="type-filter" class="store-filter-select">
+          <option value="all">All Categories</option>
+          <option value="originals">Original Works</option>
+          <option value="arrangements">Arrangements</option>
         </select>
-        <select id="inst-filter" style="padding:0.55em 0.9em;border-radius:10px;border:1.5px solid #785c52;background:#fff;font-size:0.95em;min-width:180px;">
-          <option value="all">All instruments</option>
+        <select id="inst-filter" class="store-filter-select">
+          <option value="all">All Instruments</option>
         </select>
       </div>
+
       <div id="store-cards" class="store-cards"></div>
-      <div id="pagination-controls" style="text-align:center;margin:2em 0 1em 0;"></div>
+
+      <div id="pagination-controls" class="pagination-controls"></div>
     </section>
   </main>
+
   <footer>
     <p id="copyright"></p>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var year = new Date().getFullYear();
-        var copyright = document.getElementById('copyright');
-        if (copyright) {
-          copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
-        }
-      });
-    </script>
   </footer>
+
   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var year = new Date().getFullYear();
+      var copyright = document.getElementById('copyright');
+      if (copyright) {
+        copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+      }
+    });
+
     // Robust CSV parser for quoted fields
     function parseCSV(text) {
       const lines = text.trim().split('\n');
@@ -77,7 +87,6 @@
     }
 
     let allProducts = [];
-    // Read initial page from URL so links/bookmarks preserve pagination
     let currentPage = parseInt(new URLSearchParams(window.location.search).get('page')) || 1;
     const pageSize = 18;
     let lastFilteredProducts = [];
@@ -87,21 +96,18 @@
       const type = (document.getElementById('type-filter')?.value || 'all');
       const inst = (document.getElementById('inst-filter')?.value || 'all');
       return allProducts.filter(p => {
-        // Search match
         if (q) {
           const matches = (p.title && p.title.toLowerCase().includes(q)) ||
                           (p.instrumentation && p.instrumentation.toLowerCase().includes(q)) ||
                           (p.year && p.year.toLowerCase().includes(q));
           if (!matches) return false;
         }
-        // Type filter using priceNotes
         const notes = (p.priceNotes || '').toLowerCase();
         if (type === 'originals') {
           if (!notes.includes('original')) return false;
         } else if (type === 'arrangements') {
           if (!(notes.includes('copyright') || notes.includes('public domain'))) return false;
         }
-        // Instrumentation exact-string filter (as shown in CSV)
         if (inst !== 'all') {
           const instr = (p.instrumentation || '').trim();
           if (instr !== inst) return false;
@@ -119,9 +125,8 @@
       });
       const instSelect = document.getElementById('inst-filter');
       if (!instSelect) return;
-      // Clear existing (keep first 'all')
-      instSelect.innerHTML = '<option value="all">All instruments</option>';
-      Object.keys(counts).sort((a,b)=> a.localeCompare(b)).forEach(k => {
+      instSelect.innerHTML = '<option value="all">All Instruments</option>';
+      Object.keys(counts).sort((a,b) => a.localeCompare(b)).forEach(k => {
         const opt = document.createElement('option');
         opt.value = k;
         opt.textContent = `${k} (${counts[k]})`;
@@ -140,49 +145,58 @@
     function renderStore(products, page = 1) {
       const container = document.getElementById('store-cards');
       const totalPages = Math.max(1, Math.ceil(products.length / pageSize));
-      // Clamp page into valid range
       if (page < 1) page = 1;
       if (page > totalPages) page = totalPages;
-      // Update global currentPage
       currentPage = page;
       const startIdx = (page - 1) * pageSize;
       const endIdx = startIdx + pageSize;
       const pageProducts = products.slice(startIdx, endIdx);
-      container.innerHTML = pageProducts.map((p, idx) => {
+
+      if (pageProducts.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding: 3rem; color: var(--text-muted); font-size: 1.1rem;">No scores found matching your criteria.</div>';
+        renderPagination(0, 1);
+        return;
+      }
+
+      container.innerHTML = pageProducts.map((p) => {
         const safeTitle = (p.title || '').trim();
-        // Try both .jpg and .jpeg extensions
         const imgJpg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpg`;
         const imgJpeg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpeg`;
-        // Try .jpg first, then .jpeg if .jpg fails
-        let imgTag = `<img src="${imgJpg}" alt="${safeTitle} cover" class="cover-img" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.style.display='none';}">`;
-        const detailUrl = 'product-details.html?id=' + encodeURIComponent(p.id) + '&page=' + encodeURIComponent(currentPage);
+        const imgTag = `<img src="${imgJpg}" alt="${safeTitle} cover" class="cover-img" loading="lazy" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.style.display='none';}">`;
+
+        let priceText = 'View Details';
+        if (p.price && p.price.trim()) {
+          const num = parseFloat(p.price.replace(/[^\d.]/g, ''));
+          if (isFinite(num) && num > 0) {
+            priceText = `Buy &bull; $${num.toFixed(2)}`;
+          }
+        }
+
         return `
-          <div class="product-card" data-id="${encodeURIComponent(p.id)}" tabindex="0" style="cursor:pointer;">
-            ${imgTag}
-            <h3 style="margin-bottom:0.3em;font-size:1.08em;">${p.title}</h3>
-            <div style="font-size:0.98em;color:#785c52;margin-bottom:0.1em;">${p.instrumentation} ${p.duration ? `(${p.duration} min.)` : ''}</div>
-            <button class="info-btn" data-id="${encodeURIComponent(p.id)}" style="margin-top:auto;width:100%;font-size:0.98em;" tabindex="-1">
-              Buy${(() => {
-                if (p.price && p.price.trim()) {
-                  const num = parseFloat(p.price.replace(/[^\d.]/g, ''));
-                  return isFinite(num) && num > 0 ? ` for $${num.toFixed(2)}` : '';
-                }
-                return '';
-              })()}
+          <div class="product-card" data-id="${encodeURIComponent(p.id)}" tabindex="0">
+            <div class="cover-img-frame">
+              ${imgTag}
+            </div>
+            <h3>${p.title}</h3>
+            <div class="product-meta">
+              <span class="product-instrumentation">${p.instrumentation || 'Ensemble'}</span>
+              ${p.duration ? `<span class="product-duration">${p.duration} min.</span>` : ''}
+            </div>
+            <button class="buy-btn" data-id="${encodeURIComponent(p.id)}" tabindex="-1">
+              ${priceText}
             </button>
           </div>
         `;
       }).join('');
+
       renderPagination(products.length, page);
-      // Update the URL so pagination is bookmarkable and preserved on back/forward
+
       try {
         const params = new URLSearchParams(window.location.search);
         params.set('page', String(page));
         const newUrl = window.location.pathname + '?' + params.toString();
         window.history.replaceState({}, '', newUrl);
-      } catch (e) {
-        // ignore if history is not available
-      }
+      } catch (e) {}
     }
 
     function renderPagination(totalItems, page) {
@@ -194,22 +208,24 @@
       }
       let html = '';
       if (page > 1) {
-        html += `<button id="prev-page" style="margin:0 1em 0 0;padding:0.5em 1.2em;">Previous</button>`;
+        html += `<button id="prev-page" class="pagination-btn">&larr; Previous</button>`;
       }
-      html += `<span style="font-size:1.1em;">Page ${page} of ${totalPages}</span>`;
+      html += `<span class="pagination-info">Page ${page} of ${totalPages}</span>`;
       if (page < totalPages) {
-        html += `<button id="next-page" style="margin:0 0 0 1em;padding:0.5em 1.2em;">Next</button>`;
+        html += `<button id="next-page" class="pagination-btn">Next &rarr;</button>`;
       }
       controls.innerHTML = html;
-      // Add event listeners
+
       if (page > 1) {
         document.getElementById('prev-page').onclick = function() {
           updateAndRender(currentPage - 1);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         };
       }
       if (page < totalPages) {
         document.getElementById('next-page').onclick = function() {
           updateAndRender(currentPage + 1);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         };
       }
     }
@@ -218,19 +234,14 @@
       .then(res => res.text())
       .then(text => {
         allProducts = parseCSV(text);
-        // Sort in reverse order of the CSV (last row first)
         allProducts = allProducts.reverse();
-        // Populate instrumentation filter options with counts
         populateInstrumentationFilter(allProducts);
-        // Render using current filters and page
         updateAndRender(currentPage);
       });
 
-    // Wire search box to use centralized filtering
     document.getElementById('store-search').addEventListener('input', function() {
       updateAndRender(1);
     });
-    // Wire filter dropdowns
     document.getElementById('type-filter').addEventListener('change', function() {
       updateAndRender(1);
     });
@@ -238,7 +249,6 @@
       updateAndRender(1);
     });
 
-    // Make entire product card clickable
     document.addEventListener('click', function(e) {
       const card = e.target.closest('.product-card');
       if (card) {
@@ -248,7 +258,7 @@
         }
       }
     });
-    // Optional: allow keyboard navigation
+
     document.addEventListener('keydown', function(e) {
       if ((e.key === 'Enter' || e.key === ' ') && document.activeElement.classList.contains('product-card')) {
         const encodedId = document.activeElement.getAttribute('data-id');
