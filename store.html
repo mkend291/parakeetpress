@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Sheet Music Store | Parakeet Press</title>
   <link rel="stylesheet" href="style.css?v=2.1">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -194,8 +197,13 @@
 
       try {
         const params = new URLSearchParams(window.location.search);
-        params.set('page', String(page));
-        const newUrl = window.location.pathname + '?' + params.toString();
+        if (page > 1) {
+          params.set('page', String(page));
+        } else {
+          params.delete('page');
+        }
+        const qs = params.toString();
+        const newUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
         window.history.replaceState({}, '', newUrl);
       } catch (e) {}
     }
