@@ -1,6 +1,6 @@
 /* ==========================================================================
    Parakeet Press — Professional Sheet Music Publishing House Design System
-   Color Palette: Warm Parchment & Earthy Mocha / Walnut Wood Tones
+   Color Palette: Warm Parchment Base with Signature Dark Mocha / Walnut Header
    Typography: Universal 14pt Classical Serif (Cambria, Cochin, Georgia)
    ========================================================================== */
 
@@ -14,18 +14,24 @@
     --bg-card-alt: #f5efe3;
     --bg-overlay: rgba(247, 244, 236, 0.82);
 
-    /* Brand & Espresso / Mocha Palette */
+    /* Signature Dark Brown & Espresso Palette */
     --primary: #6c4e43;
     --primary-dark: #4d352d;
     --primary-light: #8b685c;
     --primary-subtle: rgba(108, 78, 67, 0.08);
     --primary-glow: rgba(108, 78, 67, 0.18);
 
-    /* Warm Gold / Brass Accent */
+    /* Navbar Dark Brown Theme */
+    --nav-bg: rgba(90, 63, 53, 0.96); /* Rich signature dark brown */
+    --nav-text: rgba(253, 251, 247, 0.88);
+    --nav-text-hover: #ffffff;
+    --nav-border: rgba(253, 251, 247, 0.16);
+
+    /* Warm Gold / Brass Accent (Matches DanKimComposer) */
     --accent: #b07d38;
-    --accent-light: #cf9b52;
+    --accent-light: #f3d79b; /* Warm champagne gold */
     --accent-dark: #8c6024;
-    --accent-glow: rgba(176, 125, 56, 0.22);
+    --accent-glow: rgba(243, 215, 155, 0.25);
     --accent-subtle: rgba(176, 125, 56, 0.10);
 
     /* Typography Hierarchy — Deep Espresso for High Contrast Readability */
@@ -120,19 +126,19 @@ img {
 }
 
 /* ==========================================================================
-   Navigation Bar (Sticky Frosted Glass)
+   Navigation Bar (Signature Dark Brown Sticky Frosted Glass)
    ========================================================================== */
 
 .navbar {
-    background-color: rgba(253, 251, 247, 0.94);
+    background-color: var(--nav-bg);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    padding: 0.85rem 0;
+    padding: 1rem 0;
     position: sticky;
     top: 0;
-    box-shadow: 0 2px 16px rgba(77, 53, 45, 0.08);
+    box-shadow: 0 4px 20px rgba(43, 29, 23, 0.30);
     z-index: 100;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--nav-border);
 }
 
 .nav-container {
@@ -149,13 +155,13 @@ img {
     align-items: center;
     gap: 0.85rem;
     text-decoration: none;
-    color: var(--text-primary);
-    transition: opacity 0.2s ease;
+    color: #ffffff;
+    transition: opacity 0.25s ease, color 0.25s ease;
 }
 
 .logo-link:hover {
-    opacity: 0.9;
-    color: var(--primary);
+    opacity: 0.95;
+    color: var(--accent-light);
 }
 
 .logo-img {
@@ -163,48 +169,50 @@ img {
     width: auto;
     border-radius: var(--radius-sm);
     object-fit: contain;
-    box-shadow: 0 2px 6px rgba(77, 53, 45, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    background: #ffffff;
+    padding: 2px;
 }
 
 .logo-text {
     font-family: var(--font-serif);
-    font-size: 1.55rem;
+    font-size: 1.65rem;
     font-weight: 600;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--primary-dark);
+    color: #ffffff;
 }
 
 .nav-menu {
     display: flex;
     list-style: none;
     align-items: center;
-    gap: 0.6rem;
+    gap: 1.8rem;
 }
 
 .nav-link {
     font-family: var(--font-sans);
-    color: var(--text-secondary);
+    color: var(--nav-text);
     font-size: 1rem;
     font-weight: 500;
     letter-spacing: 0.06em;
     text-decoration: none;
-    padding: 0.5rem 1rem;
-    border-radius: var(--radius-sm);
+    padding: 0.45rem 0.6rem;
     border-bottom: 2px solid transparent;
-    transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    background: transparent;
 }
 
 .nav-link:hover {
-    color: var(--accent);
-    background: var(--accent-subtle);
+    color: var(--nav-text-hover);
+    border-bottom-color: rgba(253, 251, 247, 0.4);
 }
 
 .nav-link.active {
-    color: var(--primary-dark);
+    color: var(--accent-light);
     font-weight: 600;
-    border-bottom: 2px solid var(--accent);
-    background: var(--primary-subtle);
+    border-bottom-color: var(--accent-light);
+    background: transparent;
 }
 
 /* ==========================================================================
@@ -660,6 +668,35 @@ section h2::after {
 
 .product-card:hover .cover-img {
     transform: scale(1.04);
+}
+
+/* Placeholder for scores with no image available */
+.cover-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #f4ede2 0%, #ebe0cf 100%);
+    color: var(--primary);
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.cover-placeholder i {
+    font-size: 2rem;
+    color: var(--accent);
+    opacity: 0.85;
+}
+
+.cover-placeholder span {
+    font-family: var(--font-serif);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-style: italic;
+    line-height: 1.2;
 }
 
 .product-card h3 {

@@ -88,9 +88,10 @@
 
     function renderProduct(p) {
       const safeTitle = (p.title || '').trim();
+      const escapedTitle = safeTitle.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
       const imgJpg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpg`;
       const imgJpeg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpeg`;
-      let imgTag = `<img src="${imgJpg}" alt="${safeTitle} cover" class="cover-img-full" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.style.display='none';}">`;
+      let imgTag = `<img src="${imgJpg}" alt="${escapedTitle} cover" class="cover-img-full" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.parentElement.innerHTML='<div class=\\'cover-placeholder\\' style=\\'min-height:360px;\\'><i class=\\'fas fa-music\\' style=\\'font-size:3.5rem;\\'></i><span style=\\'font-size:1.1rem;margin-top:10px;\\'>${escapedTitle}</span></div>';};">`;
 
       let videoEmbed = '';
       if (p.videoLink && p.videoLink.startsWith('http')) {
