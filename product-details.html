@@ -91,7 +91,9 @@
       const escapedTitle = safeTitle.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
       const imgJpg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpg`;
       const imgJpeg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpeg`;
-      let imgTag = `<img src="${imgJpg}" alt="${escapedTitle} cover" class="cover-img-full" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.parentElement.innerHTML='<div class=\\'cover-placeholder\\' style=\\'min-height:360px;\\'><i class=\\'fas fa-music\\' style=\\'font-size:3.5rem;\\'></i><span style=\\'font-size:1.1rem;margin-top:10px;\\'>${escapedTitle}</span></div>';};">`;
+      let imgTag = `<div class="detail-cover-frame" style="max-width:650px;margin:1rem auto 1.8rem auto;border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-card);border:1px solid var(--border-subtle);">
+        <img src="${imgJpg}" alt="${escapedTitle} cover" class="cover-img-full" style="margin:0;box-shadow:none;border:none;" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.parentElement.innerHTML='<div class=\\'cover-placeholder\\' style=\\'min-height:360px;\\'><i class=\\'fas fa-music\\' style=\\'font-size:3.5rem;\\'></i><span style=\\'font-size:1.1rem;margin-top:10px;font-style:italic;\\'>${escapedTitle}</span></div>';};">
+      </div>`;
 
       let videoEmbed = '';
       if (p.videoLink && p.videoLink.startsWith('http')) {
