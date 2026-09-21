@@ -48,6 +48,7 @@
       gap: 0.8rem;
       flex-wrap: wrap;
       align-items: center;
+      min-height: 48px;
       margin-bottom: 0.8rem;
     }
     .btn-direct-primary {
@@ -60,17 +61,28 @@
       border-radius: var(--radius-sm);
       cursor: pointer;
       box-shadow: 0 2px 8px rgba(0, 112, 186, 0.25);
-      transition: all 0.2s ease;
+      transition: background 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
       font-family: inherit;
       text-decoration: none;
     }
-    .btn-direct-primary:hover {
+    .btn-direct-primary:hover:not(:disabled) {
       background: #005ea6;
       box-shadow: 0 4px 14px rgba(0, 112, 186, 0.35);
       transform: translateY(-1px);
+    }
+    .btn-direct-primary:disabled {
+      opacity: 0.88;
+      cursor: wait;
+      box-shadow: none;
+      transform: none !important;
+    }
+    .btn-direct-checking {
+      background: #0064a7 !important;
+      border-color: #005288 !important;
+      pointer-events: none;
     }
     #request-custom-edition-btn {
       background: #5a3f35 !important; /* Signature dark brown matching navbar */
@@ -84,17 +96,33 @@
       box-shadow: 0 4px 14px rgba(90, 63, 53, 0.4) !important;
       transform: translateY(-1px);
     }
+    .btn-state-transitioning {
+      opacity: 0 !important;
+      transform: scale(0.97) !important;
+      transition: opacity 0.14s ease, transform 0.14s ease !important;
+    }
+    .btn-state-active {
+      animation: btnStateBloom 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes btnStateBloom {
+      from {
+        opacity: 0;
+        transform: scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
     .action-btn-fade-in {
-      animation: actionBtnFade 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: actionBtnFade 0.25s ease-out forwards;
     }
     @keyframes actionBtnFade {
       from {
         opacity: 0;
-        transform: translateY(5px);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
       }
     }
     .checking-skeleton {
@@ -181,6 +209,12 @@
   </style>
 </head>
 <body>
+  <!-- Preload FontAwesome Glyphs to prevent icon flash / layout jitter -->
+  <div style="position:absolute;width:0;height:0;overflow:hidden;opacity:0;pointer-events:none;" aria-hidden="true">
+    <i class="fa-brands fa-paypal"></i>
+    <i class="fa-solid fa-circle-notch"></i>
+  </div>
+
   <header class="navbar">
     <div class="nav-container">
       <a href="index.html" class="logo-link">
@@ -334,8 +368,8 @@
       const escapedTitle = safeTitle.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
       const imgJpg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpg`;
       const imgJpeg = `pp_files/pp_store/pp_cover-imgs/${safeTitle}.jpeg`;
-      let imgTag = `<div class="detail-cover-frame" style="max-width:650px;margin:1rem auto 1.8rem auto;border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-card);border:1px solid var(--border-subtle);">
-        <img src="${imgJpg}" alt="${escapedTitle} cover" class="cover-img-full" style="margin:0;box-shadow:none;border:none;" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.parentElement.innerHTML='<div class=\\'cover-placeholder\\' style=\\'min-height:360px;\\'><i class=\\'fas fa-music\\' style=\\'font-size:3.5rem;\\'></i><span style=\\'font-size:1.1rem;margin-top:10px;font-style:italic;\\'>${escapedTitle}</span></div>';};">
+      let imgTag = `<div class="detail-cover-frame">
+        <img src="${imgJpg}" alt="${escapedTitle} cover" class="cover-img-full" onerror="this.onerror=null;this.src='${imgJpeg}';this.onerror=function(){this.parentElement.innerHTML='<div class=\\'cover-placeholder\\' style=\\'min-height:380px;\\'><i class=\\'fas fa-music\\' style=\\'font-size:3.5rem;\\'></i><span style=\\'font-size:1.1rem;margin-top:10px;font-style:italic;\\'>${escapedTitle}</span></div>';};">
       </div>`;
 
       let videoEmbed = '';
@@ -595,13 +629,8 @@
 
           <!-- Side-by-Side Action Buttons -->
           <div class="detail-actions-row">
-            ${!hasVendorLink ? `
-              <div id="vault-checking-skeleton" class="checking-skeleton">
-                <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--accent);"></i> Checking availability...
-              </div>
-            ` : ''}
-            <button class="btn-direct-primary" id="start-direct-checkout" type="button" style="display:none;">
-              <i class="fa-brands fa-paypal"></i> Buy Direct (<span id="direct-btn-price">${effectiveDirectPrice}</span>)
+            <button class="btn-direct-primary btn-direct-checking" id="start-direct-checkout" type="button" disabled style="display:inline-flex;">
+              <i class="fa-solid fa-circle-notch fa-spin"></i> Checking Direct Buy (<span id="direct-btn-price">${effectiveDirectPrice}</span>)...
             </button>
             <button class="btn-direct-primary" id="request-custom-edition-btn" type="button" style="display:none;">
               <i class="fa-solid fa-envelope"></i> <span id="request-edition-label">Request Arrangement from Daniel</span>
@@ -751,6 +780,7 @@
         card.innerHTML = renderProduct(p);
 
         setTimeout(() => {
+          const effectiveDirectPrice = p.directPrice || calculateAlgorithmicDirectPrice(p);
           const openBtn = document.getElementById('open-email-modal');
           const closeBtn = document.getElementById('close-email-modal');
           const modal = document.getElementById('email-modal');
@@ -794,6 +824,10 @@
 
             if (inVault) {
               if (directBtn) {
+                directBtn.classList.remove('btn-direct-checking');
+                directBtn.removeAttribute('disabled');
+                const priceVal = (typeof effectiveDirectPrice !== 'undefined' && effectiveDirectPrice) || (p && p.directPrice) || '$4.00';
+                directBtn.innerHTML = `<i class="fa-brands fa-paypal"></i> Buy Direct (<span id="direct-btn-price">${priceVal}</span>)`;
                 directBtn.style.display = 'inline-flex';
                 if (shouldFade) {
                   directBtn.classList.remove('action-btn-fade-in');
@@ -907,13 +941,65 @@
             // Determine if the piece has an active multi-edition picker visible to the customer
             const hasActiveInstSelect = instSelect && instWrapper && instWrapper.style.display !== 'none' && instSelect.options.length > 1;
 
-            if (!vaultData || !vaultData.success) {
-              if (!hasVendorLink) {
-                if (contactBtn) {
-                  contactBtn.style.display = 'inline-block';
-                  contactBtn.classList.add('action-btn-fade-in');
+            function activateDirectButton() {
+              if (!directBtn) return;
+              if (!directBtn.classList.contains('btn-direct-checking')) {
+                const priceVal = (typeof effectiveDirectPrice !== 'undefined' && effectiveDirectPrice) || (p && p.directPrice) || '$4.00';
+                directBtn.innerHTML = `<i class="fa-brands fa-paypal"></i> Buy Direct (<span id="direct-btn-price">${priceVal}</span>)`;
+                directBtn.style.display = 'inline-flex';
+                if (contactBtn) contactBtn.style.display = 'none';
+                if (noteEl) noteEl.style.display = 'none';
+                return;
+              }
+
+              directBtn.classList.add('btn-state-transitioning');
+              setTimeout(() => {
+                directBtn.classList.remove('btn-direct-checking', 'btn-state-transitioning');
+                directBtn.removeAttribute('disabled');
+                const priceVal = (typeof effectiveDirectPrice !== 'undefined' && effectiveDirectPrice) || (p && p.directPrice) || '$4.00';
+                directBtn.innerHTML = `<i class="fa-brands fa-paypal"></i> Buy Direct (<span id="direct-btn-price">${priceVal}</span>)`;
+                directBtn.style.display = 'inline-flex';
+                directBtn.classList.add('btn-state-active');
+              }, 140);
+              if (contactBtn) contactBtn.style.display = 'none';
+              if (noteEl) noteEl.style.display = 'none';
+            }
+
+            function showFallbackContact() {
+              if (directBtn && directBtn.style.display !== 'none') {
+                directBtn.classList.add('btn-state-transitioning');
+                setTimeout(() => {
+                  directBtn.style.display = 'none';
+                  directBtn.classList.remove('btn-state-transitioning');
+                  if (!hasVendorLink) {
+                    if (contactBtn) {
+                      contactBtn.style.display = 'inline-block';
+                      contactBtn.classList.add('btn-state-active');
+                    }
+                  } else {
+                    if (noteEl) {
+                      noteEl.style.display = 'block';
+                      noteEl.classList.add('btn-state-active');
+                    }
+                  }
+                }, 140);
+              } else {
+                if (!hasVendorLink) {
+                  if (contactBtn) {
+                    contactBtn.style.display = 'inline-block';
+                    contactBtn.classList.add('btn-state-active');
+                  }
+                } else {
+                  if (noteEl) {
+                    noteEl.style.display = 'block';
+                    noteEl.classList.add('btn-state-active');
+                  }
                 }
               }
+            }
+
+            if (!vaultData || !vaultData.success) {
+              showFallbackContact();
               return;
             }
 
@@ -946,7 +1032,7 @@
                   tagEl.style.display = 'inline';
                 }
               }
-              updateMultiPartButtonState(true);
+              updateMultiPartButtonState(false);
             } else if (vaultData.availableEditions && vaultData.availableEditions.length > 0) {
               // 2. Vault has instrument / multi-part editions available, even if not yet mapped in solo-arr-catalogue.csv!
               if (instSelect && instWrapper) {
@@ -1005,34 +1091,13 @@
                 multiBlock.innerHTML = html;
               }
 
-              if (directBtn) {
-                directBtn.style.display = 'inline-flex';
-                directBtn.classList.add('action-btn-fade-in');
-              }
-              if (contactBtn) contactBtn.style.display = 'none';
-              if (noteEl) noteEl.style.display = 'none';
+              activateDirectButton();
             } else {
               // 3. Standalone Pieces (or pieces without instrument catalogue entries)
               if (vaultData.hasStandaloneScore) {
-                if (directBtn) {
-                  directBtn.style.display = 'inline-flex';
-                  directBtn.classList.add('action-btn-fade-in');
-                }
-                if (contactBtn) contactBtn.style.display = 'none';
-                if (noteEl) noteEl.style.display = 'none';
+                activateDirectButton();
               } else {
-                if (directBtn) directBtn.style.display = 'none';
-                if (hasVendorLink) {
-                  if (noteEl) {
-                    noteEl.style.display = 'block';
-                    noteEl.classList.add('action-btn-fade-in');
-                  }
-                } else {
-                  if (contactBtn) {
-                    contactBtn.style.display = 'inline-block';
-                    contactBtn.classList.add('action-btn-fade-in');
-                  }
-                }
+                showFallbackContact();
               }
             }
           });
