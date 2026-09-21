@@ -668,6 +668,10 @@
             <p style="margin:0;font-size:0.88rem;color:#456e50;">
               <i class="fa-solid fa-circle-check"></i> Purchase recorded (<span id="success-buyer-email"></span>). Your download will start automatically. If it does not, click the button above.
             </p>
+            <div style="margin-top:1rem;padding-top:0.8rem;border-top:1px dashed #b7dfca;font-size:0.88rem;color:#356743;text-align:center;">
+              <strong>Order ID:</strong> <code id="success-order-id" style="background:#e3f2e8;padding:0.2rem 0.4rem;border-radius:4px;font-weight:bold;"></code><br>
+              <span style="font-size:0.82rem;color:#456e50;display:inline-block;margin-top:0.3rem;">Need to download on another device later? Save this Order ID to retrieve your score anytime on our <a href="downloads.html" style="color:#205230;font-weight:600;text-decoration:underline;">Re-Download Portal</a>.</span>
+            </div>
           </div>
         </div>
       `;
@@ -687,7 +691,6 @@
             ${directPrice ? `
               <p><strong>Direct Composer Price:</strong> <span style="text-decoration:line-through;color:var(--text-muted);margin-right:0.4rem;">${price}</span><span style="color:var(--primary-dark);font-weight:bold;">${directPrice}${percentOff}</span></p>
             ` : ''}
-            <p id="total-sold" style="display:none;"><strong>Total Distributed:</strong> <span id="total-sold-value"></span></p>
           </div>
 
           ${multiPartsBlock}
@@ -726,57 +729,6 @@
       card.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--text-muted);">${msg}</div>`;
     }
 
-    function fetchSalesCount(productTitle) {
-      function normalize(value) {
-        return (value || '').trim().toLowerCase();
-      }
-      function baseWithoutParen(title) {
-        return normalize((title || '').replace(/\([^)]*\)/g, '').trim());
-      }
-      function containsAndPiano(title) {
-        return /(?:\band\s+piano\b|&\s*piano\b)/i.test(title || '');
-      }
-      function baseFromSalesPianoTitle(title) {
-        const withoutPianoParen = (title || '').replace(/\([^)]*(?:and|&)\s*piano[^)]*\)/i, '').trim();
-        return baseWithoutParen(withoutPianoParen);
-      }
-
-      return Promise.all([
-        fetch('pp_files/pp_store/ArrangeMe_Sales_Report.csv').then(res => res.text()),
-        fetch('pp_files/pp_store/solo-arr-catalogue.csv').then(res => res.text())
-      ])
-      .then(([salesText, soloText]) => {
-        const salesRows = parseCSV(salesText);
-        const soloRows = parseCSV(soloText);
-        const productTitleNormalized = normalize(productTitle);
-        const soloTitles = soloRows.map(row => (row.Title || row.title || '').trim()).filter(Boolean);
-
-        function mapSalesTitleToScoreTitle(salesTitle) {
-          const salesTitleNormalized = normalize(salesTitle);
-          const directSoloMatch = soloTitles.find(t => normalize(t) === salesTitleNormalized);
-          if (directSoloMatch) return normalize(directSoloMatch);
-          if (containsAndPiano(salesTitle)) {
-            const salesBase = baseFromSalesPianoTitle(salesTitle);
-            const mappedSolo = soloTitles.find(t => baseWithoutParen(t) === salesBase);
-            if (mappedSolo) return normalize(mappedSolo);
-          }
-          return salesTitleNormalized;
-        }
-
-        let count = 0;
-        salesRows.forEach(row => {
-          const txType = normalize(row['Transaction Type'] || row['transaction type']);
-          if (txType !== 'purchase') return;
-          const salesTitle = (row.Title || row.title || '').trim();
-          if (mapSalesTitleToScoreTitle(salesTitle) === productTitleNormalized) {
-            count++;
-          }
-        });
-        return count;
-      })
-      .catch(() => 0);
-    }
-
     fetch('pp_files/pp_store/scoresShop.csv')
       .then(res => {
         if (!res.ok) throw new Error('Network error');
@@ -797,15 +749,6 @@
         }
 
         card.innerHTML = renderProduct(p);
-
-        fetchSalesCount(p.title).then(count => {
-          const totalSoldDiv = document.getElementById('total-sold');
-          const totalSoldValue = document.getElementById('total-sold-value');
-          if (count > 0 && totalSoldDiv && totalSoldValue) {
-            totalSoldValue.textContent = count;
-            totalSoldDiv.style.display = 'block';
-          }
-        });
 
         setTimeout(() => {
           const openBtn = document.getElementById('open-email-modal');
@@ -923,11 +866,11 @@
           const isMultipleTrans = isPieceMultiTrans(p);
           const hasVendorLink = pieceHasVendorLink(p);
 
-          // Live Vault Inventory Check (Bypasses cache on localhost / admin mode!)
+          // Live Vault Inventory Check (Bypasses cache on localhost)
           async function fetchVaultAvailability(pieceTitle) {
-            const isDevOrAdmin = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || localStorage.getItem('parakeet_admin') === 'true';
+            const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
             const cacheKey = 'pp_avail_' + pieceTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
-            if (!isDevOrAdmin) {
+            if (!isDev) {
               try {
                 const cached = sessionStorage.getItem(cacheKey);
                 if (cached) return JSON.parse(cached);
@@ -1108,62 +1051,26 @@
             };
           }
 
-          // Admin Mode detection: localhost OR ?admin=1 OR localStorage('parakeet_admin')
-          try {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('admin') === '1' || urlParams.get('admin') === 'true') {
-              localStorage.setItem('parakeet_admin', 'true');
-            } else if (urlParams.get('admin') === '0' || urlParams.get('admin') === 'false') {
-              localStorage.removeItem('parakeet_admin');
+          // Test/Simulation Mode: Strictly restricted to localhost (completely removed in production)
+          const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+          const adminContainer = document.getElementById('admin-simulation-container');
+
+          if (isLocal) {
+            if (adminContainer) adminContainer.style.display = 'flex';
+            if (simBtn) {
+              simBtn.onclick = function() {
+                handleSuccessfulPurchase({
+                  orderId: 'PP_SIM_' + Date.now().toString(36).toUpperCase(),
+                  payerEmail: 'test-musician@example.com',
+                  title: p.title,
+                  instrument: window.currentSelectedInstrument || '',
+                  amount: (p.directPrice || p.price || '$4.00').trim(),
+                  isSimulation: true
+                });
+              };
             }
-
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const isAdmin = isLocal || localStorage.getItem('parakeet_admin') === 'true';
-
-            const adminContainer = document.getElementById('admin-simulation-container');
-            if (adminContainer && isAdmin) {
-              adminContainer.style.display = 'flex';
-            }
-
-            // Secret toggle: Clicking the checkout header 3 times toggles Admin Mode on/off
-            const checkoutHeader = document.querySelector('#direct-checkout-drawer h4');
-            if (checkoutHeader) {
-              let clicks = 0;
-              let timer = null;
-              checkoutHeader.style.userSelect = 'none';
-              checkoutHeader.addEventListener('click', function() {
-                clicks++;
-                clearTimeout(timer);
-                timer = setTimeout(() => { clicks = 0; }, 600);
-                if (clicks >= 3) {
-                  clicks = 0;
-                  const currentlyAdmin = localStorage.getItem('parakeet_admin') === 'true';
-                  if (currentlyAdmin) {
-                    localStorage.removeItem('parakeet_admin');
-                    if (adminContainer) adminContainer.style.display = 'none';
-                    alert('Store Owner Test Mode: DISABLED (hidden from view)');
-                  } else {
-                    localStorage.setItem('parakeet_admin', 'true');
-                    if (adminContainer) adminContainer.style.display = 'flex';
-                    alert('Store Owner Test Mode: ENABLED (visible on this device)');
-                  }
-                }
-              });
-            }
-          } catch (e) {
-            console.warn('Admin check error:', e);
-          }
-
-          if (simBtn) {
-            simBtn.onclick = function() {
-              handleSuccessfulPurchase({
-                orderId: 'PP_' + Date.now().toString(36).toUpperCase(),
-                payerEmail: 'test-musician@example.com',
-                title: p.title,
-                instrument: window.currentSelectedInstrument || '',
-                amount: (p.directPrice || p.price || '$4.00').trim()
-              });
-            };
+          } else {
+            if (adminContainer) adminContainer.remove();
           }
         }, 0);
 
@@ -1251,6 +1158,8 @@
             ? rawOrderId
             : ('PP_' + rawOrderId.replace(/^PP[-_]?/i, '').replace(/^DEMO[-_]?/i, ''));
           details.orderId = cleanOrderId; // Kept consistent across Invoice Cover & sales sheet
+          const successOrderId = document.getElementById('success-order-id');
+          if (successOrderId) successOrderId.textContent = cleanOrderId;
 
           const cleanTitle = (details.title || 'Score').trim().replace(/[/\\?%*:|"<>]/g, '');
           const cleanInst = (details.instrument || '').trim().replace(/[/\\?%*:|"<>]/g, '');
@@ -1274,7 +1183,8 @@
                   pieceTitle: cleanTitle,
                   instrument: details.instrument || '',
                   buyerEmail: details.payerEmail,
-                  amount: details.amount || '$4.00'
+                  amount: details.amount || '$4.00',
+                  isSimulation: Boolean(details.isSimulation)
                 })
               });
               const data = await res.json();

@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Re-Download Purchased Scores | Parakeet Press</title>
+  <link rel="stylesheet" href="style.css?v=2.2">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- PDF-Lib for generating and merging official Page 1 Invoice Covers -->
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <style>
+    .portal-container {
+      max-width: 640px;
+      margin: 2.5rem auto;
+      padding: 0 1rem;
+    }
+    .portal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg);
+      padding: 2.2rem;
+      box-shadow: var(--shadow-subtle);
+    }
+    .portal-card h2 {
+      font-size: 1.7rem;
+      margin-bottom: 0.4rem;
+      color: var(--primary-dark);
+      text-align: center;
+    }
+    .portal-card .subtitle {
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 1rem;
+      margin-bottom: 1.8rem;
+      line-height: 1.5;
+    }
+    .form-group {
+      margin-bottom: 1.3rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 0.4rem;
+      font-size: 0.95rem;
+    }
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 1rem;
+      background: var(--bg-base);
+      color: var(--text-primary);
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: #fff;
+    }
+    .portal-btn {
+      display: block;
+      width: 100%;
+      padding: 0.9rem;
+      background: var(--primary-dark);
+      color: var(--text-on-primary);
+      border: none;
+      border-radius: var(--radius-md);
+      font-family: inherit;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.2s, transform 0.1s;
+      box-sizing: border-box;
+    }
+    .portal-btn:hover {
+      background: var(--primary);
+    }
+    .portal-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .status-box {
+      margin-top: 1.5rem;
+      padding: 1.2rem;
+      border-radius: var(--radius-md);
+      display: none;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+    .status-box.error {
+      display: block;
+      background: #fdf2f2;
+      border: 1px solid #e0b4b4;
+      color: #9f3a38;
+    }
+    .status-box.loading {
+      display: block;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      text-align: center;
+    }
+    .status-box.success {
+      display: block;
+      background: #f0f7f3;
+      border: 1px solid #b7dfca;
+      color: #24573f;
+    }
+    .download-action-btn {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.85rem 1.4rem;
+      background: #2b7a4b;
+      color: #fff;
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      font-weight: bold;
+      font-size: 1rem;
+      text-align: center;
+      transition: background 0.2s;
+    }
+    .download-action-btn:hover {
+      background: #23633d;
+    }
+    .help-callout {
+      margin-top: 2rem;
+      padding: 1.1rem 1.3rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo-link">
+        <img src="pp_files/PP_Logo_Original.png" alt="Parakeet Press Logo" class="logo-img">
+        <span class="logo-text">Parakeet Press</span>
+      </a>
+      <nav>
+        <ul class="nav-menu">
+          <li><a href="index.html" class="nav-link">Home</a></li>
+          <li><a href="services.html" class="nav-link">Services</a></li>
+          <li><a href="store.html" class="nav-link">Store</a></li>
+          <li><a href="chirp.html" class="nav-link">Chirp!</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="portal-container">
+      <div class="portal-card">
+        <h2><i class="fa-solid fa-file-circle-check" style="color:var(--accent);margin-right:0.4rem;"></i> Score Re-Download Portal</h2>
+        <p class="subtitle">Enter your Order ID and checkout email address to retrieve your sheet music and parts on any device.</p>
+
+        <form id="redownload-form">
+          <div class="form-group">
+            <label for="order-id">Order ID</label>
+            <input type="text" id="order-id" class="form-input" placeholder="e.g. PP_1A2B3C4D..." required autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="buyer-email">Email Address</label>
+            <input type="email" id="buyer-email" class="form-input" placeholder="The PayPal email used at checkout" required autocomplete="email">
+          </div>
+
+          <button type="submit" id="submit-btn" class="portal-btn">
+            <i class="fa-solid fa-cloud-arrow-down"></i> Retrieve & Download Score
+          </button>
+        </form>
+
+        <div id="status-box" class="status-box"></div>
+
+        <div class="help-callout">
+          <strong><i class="fa-regular fa-circle-question"></i> Need help locating your Order ID?</strong><br>
+          Your Order ID begins with <code>PP_</code> and was shown on your order confirmation screen and listed in your PayPal receipt.<br>
+          If you cannot find it, please <a href="services.html#contact" style="color:var(--primary-dark);font-weight:600;text-decoration:underline;">contact Daniel Kim</a> with your name or approximate purchase date and we will retrieve it for you.
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p id="copyright"></p>
+  </footer>
+
+  <script>
+    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbHp_SGN3TE1e-rKMGqLfjZcXmz6MDzOdqZeMb0x1bcr1ac3Tq9Hhy1O_dkJAyU_gVoA/exec";
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const year = new Date().getFullYear();
+      const copyright = document.getElementById('copyright');
+      if (copyright) {
+        copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
+      }
+
+      // Auto-populate from URL parameters if accessed via bookmark link (e.g. ?order=PP_...&email=...)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlOrder = urlParams.get('order') || urlParams.get('orderId') || '';
+      const urlEmail = urlParams.get('email') || '';
+
+      if (urlOrder) document.getElementById('order-id').value = urlOrder.trim();
+      if (urlEmail) document.getElementById('buyer-email').value = urlEmail.trim();
+
+      // Auto-submit if both are populated
+      if (urlOrder && urlEmail) {
+        processLookup(urlOrder.trim(), urlEmail.trim());
+      }
+    });
+
+    const form = document.getElementById('redownload-form');
+    const statusBox = document.getElementById('status-box');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const orderId = document.getElementById('order-id').value.trim();
+      const email = document.getElementById('buyer-email').value.trim();
+      processLookup(orderId, email);
+    });
+
+    async function processLookup(orderId, email) {
+      if (!orderId || !email) return;
+
+      submitBtn.disabled = true;
+      statusBox.className = 'status-box loading';
+      statusBox.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Searching order records and retrieving score from vault...`;
+
+      try {
+        const res = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          redirect: 'follow',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify({
+            action: 'lookup_order',
+            orderId: orderId,
+            buyerEmail: email
+          })
+        });
+
+        const data = await res.json();
+
+        if (data && data.success && data.pdfBase64) {
+          statusBox.className = 'status-box loading';
+          statusBox.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparing Official Score with Page 1 License Cover...`;
+
+          // Decode Base64 to ArrayBuffer
+          const binaryString = window.atob(data.pdfBase64);
+          const len = binaryString.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+
+          const cleanTitle = (data.pieceTitle || 'Score').replace(/[/\\?%*:|"<>]/g, '');
+          const cleanInst = (data.instrument || '').replace(/[/\\?%*:|"<>]/g, '');
+          const filename = cleanInst ? `${cleanTitle}_${cleanInst}_${data.orderId}.pdf` : `${cleanTitle}_${data.orderId}.pdf`;
+
+          const mergedBytes = await generateInvoiceCoverAndMerge(bytes.buffer, {
+            orderId: data.orderId,
+            payerEmail: email,
+            title: data.pieceTitle,
+            instrument: data.instrument || '',
+            amount: data.amount || '$4.00',
+            date: data.date
+          });
+
+          const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(blob);
+
+          statusBox.className = 'status-box success';
+          statusBox.innerHTML = `
+            <strong><i class="fa-solid fa-circle-check"></i> Score Verified & Ready!</strong><br>
+            <div style="margin: 0.6rem 0; font-size: 0.95rem;">
+              <strong>Piece:</strong> ${data.pieceTitle} ${data.instrument ? `(${data.instrument})` : ''}<br>
+              <strong>Order ID:</strong> ${data.orderId}<br>
+              ${data.date ? `<strong>Purchased:</strong> ${data.date}<br>` : ''}
+            </div>
+            <a href="${blobUrl}" download="${filename}" class="download-action-btn" id="download-trigger">
+              <i class="fa-solid fa-file-arrow-down"></i> Download Score & Parts (${filename})
+            </a>
+          `;
+
+          // Auto-trigger download
+          setTimeout(() => {
+            const trigger = document.getElementById('download-trigger');
+            if (trigger) trigger.click();
+          }, 300);
+
+        } else {
+          statusBox.className = 'status-box error';
+          statusBox.innerHTML = `
+            <strong><i class="fa-solid fa-triangle-exclamation"></i> Order Not Found</strong><br>
+            ${data.error || 'We could not find a verified purchase matching that Order ID and email address.'}<br>
+            <span style="font-size:0.9rem;display:inline-block;margin-top:0.4rem;">Please double-check your Order ID and the exact email address used for PayPal checkout.</span>
+          `;
+        }
+      } catch (err) {
+        statusBox.className = 'status-box error';
+        statusBox.innerHTML = `
+          <strong><i class="fa-solid fa-circle-exclamation"></i> Connection Notice</strong><br>
+          Unable to reach the verification vault at this moment. Please check your internet connection or try again shortly.
+        `;
+        console.error('Re-download lookup failed:', err);
+      } finally {
+        submitBtn.disabled = false;
+      }
+    }
+
+    async function generateInvoiceCoverAndMerge(rawScoreBytes, details) {
+      if (!window.PDFLib) return rawScoreBytes;
+      try {
+        const { PDFDocument, rgb, StandardFonts, PageSizes } = window.PDFLib;
+        const invoiceDoc = await PDFDocument.create();
+        const page = invoiceDoc.addPage(PageSizes.Letter);
+        const fontBold = await invoiceDoc.embedFont(StandardFonts.HelveticaBold);
+        const fontRegular = await invoiceDoc.embedFont(StandardFonts.Helvetica);
+        const fontOblique = await invoiceDoc.embedFont(StandardFonts.HelveticaOblique);
+
+        // Logo
+        try {
+          const logoRes = await fetch('pp_files/PP_Logo_Original.png');
+          if (logoRes.ok) {
+            const logoBuffer = await logoRes.arrayBuffer();
+            const logoImage = await invoiceDoc.embedPng(logoBuffer);
+            const logoDims = logoImage.scale(0.013);
+            page.drawImage(logoImage, {
+              x: (612 - logoDims.width) / 2,
+              y: 675,
+              width: logoDims.width,
+              height: logoDims.height
+            });
+          }
+        } catch (e) {}
+
+        // Outer borders
+        page.drawRectangle({
+          x: 28, y: 28, width: 612 - 56, height: 792 - 56,
+          borderColor: rgb(0.30, 0.21, 0.18), borderWidth: 1.5
+        });
+        page.drawRectangle({
+          x: 33, y: 33, width: 612 - 66, height: 792 - 66,
+          borderColor: rgb(0.69, 0.49, 0.22), borderWidth: 0.75
+        });
+
+        // Header
+        const headerText = "PARAKEET PRESS";
+        const headerWidth = fontBold.widthOfTextAtSize(headerText, 22);
+        page.drawText(headerText, {
+          x: (612 - headerWidth) / 2, y: 642, size: 22,
+          font: fontBold, color: rgb(0.30, 0.21, 0.18)
+        });
+
+        const subheaderText = "OFFICIAL DIGITAL SCORE EDITION & LICENSE CERTIFICATE";
+        const subheaderWidth = fontRegular.widthOfTextAtSize(subheaderText, 8.5);
+        page.drawText(subheaderText, {
+          x: (612 - subheaderWidth) / 2, y: 624, size: 8.5,
+          font: fontRegular, color: rgb(0.42, 0.31, 0.26)
+        });
+
+        // Divider
+        page.drawRectangle({
+          x: 50, y: 610, width: 512, height: 1.5, color: rgb(0.69, 0.49, 0.22)
+        });
+
+        // Order Details Box
+        page.drawRectangle({
+          x: 50, y: 350, width: 512, height: 240,
+          color: rgb(0.95, 0.93, 0.89),
+          borderColor: rgb(0.80, 0.74, 0.67),
+          borderWidth: 1
+        });
+
+        let currentY = 560;
+        function drawRow(label, value, isHighlight) {
+          page.drawText(label, {
+            x: 70, y: currentY, size: 10,
+            font: fontBold, color: rgb(0.30, 0.21, 0.18)
+          });
+          page.drawText(value || 'N/A', {
+            x: 210, y: currentY, size: 10,
+            font: isHighlight ? fontBold : fontRegular,
+            color: isHighlight ? rgb(0.18, 0.42, 0.24) : rgb(0.20, 0.15, 0.12)
+          });
+          currentY -= 26;
+        }
+
+        drawRow("Work / Title:", details.title, true);
+        if (details.instrument) {
+          drawRow("Instrument Edition:", details.instrument);
+        }
+        drawRow("Order ID:", details.orderId, true);
+        drawRow("Licensed Email:", details.payerEmail);
+        drawRow("Purchase Amount:", details.amount || "$4.00");
+        drawRow("Status:", "Verified & Re-Delivered via Direct Portal", true);
+
+        // License terms
+        page.drawText("AUTHORIZED PERFORMANCE & EDUCATIONAL LICENSE", {
+          x: 50, y: 320, size: 10, font: fontBold, color: rgb(0.30, 0.21, 0.18)
+        });
+        const terms = [
+          "1. This license authorizes personal rehearsal, performance, and archival study by the verified purchaser.",
+          "2. Direct composer purchases guarantee official engraving quality, verified parts, and ongoing update support.",
+          "3. Re-distribution, public sharing, or unauthorized resale of this digital file is strictly prohibited by law."
+        ];
+        let termY = 300;
+        terms.forEach(t => {
+          page.drawText(t, { x: 50, y: termY, size: 8, font: fontRegular, color: rgb(0.35, 0.28, 0.24) });
+          termY -= 16;
+        });
+
+        // Contact footer
+        const contactMsg = "Need custom transpositions, engraving adjustments, or parts? Contact Daniel Kim: dankimcomposer@gmail.com";
+        const cWidth = fontOblique.widthOfTextAtSize(contactMsg, 8.5);
+        page.drawText(contactMsg, {
+          x: (612 - cWidth) / 2, y: 118, size: 8.5, font: fontOblique, color: rgb(0.42, 0.31, 0.26)
+        });
+
+        const nextNotice = "— Official Music Score & Instrumental Parts Follow on Page 2 —";
+        const nWidth = fontBold.widthOfTextAtSize(nextNotice, 9.5);
+        page.drawText(nextNotice, {
+          x: (612 - nWidth) / 2, y: 88, size: 9.5, font: fontBold, color: rgb(0.30, 0.21, 0.18)
+        });
+
+        // Merge original score pages
+        if (rawScoreBytes) {
+          const loadedScore = await PDFDocument.load(rawScoreBytes);
+          const copiedPages = await invoiceDoc.copyPages(loadedScore, loadedScore.getPageIndices());
+          copiedPages.forEach(p => invoiceDoc.addPage(p));
+        }
+
+        return await invoiceDoc.save();
+      } catch (e) {
+        console.warn('Invoice cover merge failed, falling back to raw score:', e);
+        return rawScoreBytes;
+      }
+    }
+  </script>
+</body>
+</html>

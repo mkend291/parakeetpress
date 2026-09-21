@@ -295,7 +295,9 @@
         }
         if (successAmount) successAmount.textContent = amountStr;
 
-        if (GOOGLE_APPS_SCRIPT_URL && GOOGLE_APPS_SCRIPT_URL.startsWith('http')) {
+        // Only log real donations to the ledger (skip simulations)
+        const isSimOrder = orderId && (orderId.startsWith('PP_SIM_') || orderId.startsWith('DEMO'));
+        if (!isSimOrder && GOOGLE_APPS_SCRIPT_URL && GOOGLE_APPS_SCRIPT_URL.startsWith('http')) {
           try {
             fetch(GOOGLE_APPS_SCRIPT_URL, {
               method: 'POST',
@@ -311,13 +313,6 @@
         }
       }
 
-      if (simulateBtn) {
-        simulateBtn.addEventListener('click', function() {
-          const amt = getAmount();
-          handleSuccess(`$${amt}.00`, `PP_SIM_${Date.now()}`);
-        });
-      }
-
       if (tipAgainBtn) {
         tipAgainBtn.addEventListener('click', function() {
           if (successCard) successCard.style.display = 'none';
@@ -325,43 +320,20 @@
         });
       }
 
-      // Admin / Simulation Visibility (Hidden on live site unless admin)
+      // Admin / Simulation Visibility: Strictly restricted to localhost (removed in production)
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('admin') === 'true' || urlParams.get('admin') === '1') {
-        localStorage.setItem('parakeet_admin', 'true');
-      }
-      const isAdmin = isLocal || localStorage.getItem('parakeet_admin') === 'true';
-
       const simContainer = document.getElementById('admin-simulation-row');
-      if (simContainer && isAdmin) {
-        simContainer.style.display = 'block';
-      }
 
-      // Secret toggle: Clicking the title 3 times toggles Admin Mode on/off
-      const titleEl = document.querySelector('.donate-container h2');
-      if (titleEl) {
-        let clicks = 0;
-        let timer = null;
-        titleEl.style.userSelect = 'none';
-        titleEl.addEventListener('click', function() {
-          clicks++;
-          clearTimeout(timer);
-          timer = setTimeout(() => { clicks = 0; }, 600);
-          if (clicks >= 3) {
-            clicks = 0;
-            const currentlyAdmin = localStorage.getItem('parakeet_admin') === 'true';
-            if (currentlyAdmin) {
-              localStorage.removeItem('parakeet_admin');
-              if (simContainer) simContainer.style.display = 'none';
-              alert('Store Owner Test Mode: DISABLED (hidden from view)');
-            } else {
-              localStorage.setItem('parakeet_admin', 'true');
-              if (simContainer) simContainer.style.display = 'block';
-              alert('Store Owner Test Mode: ENABLED (visible on this device)');
-            }
-          }
-        });
+      if (isLocal) {
+        if (simContainer) simContainer.style.display = 'block';
+        if (simulateBtn) {
+          simulateBtn.addEventListener('click', function() {
+            const amt = getAmount();
+            handleSuccess(`$${amt}.00`, `PP_SIM_${Date.now()}`);
+          });
+        }
+      } else {
+        if (simContainer) simContainer.remove();
       }
 
       function initPayPal() {

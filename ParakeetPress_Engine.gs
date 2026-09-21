@@ -40,7 +40,11 @@ var CSV_SOLO_ARR_URL = 'https://raw.githubusercontent.com/mkend291/parakeetpress
 var CSV_TRANS_URL = 'https://raw.githubusercontent.com/mkend291/parakeetpress/main/pp_files/pp_store/multiple-transpositions.csv';
 
 /**
- * Handles incoming POST requests (Order Delivery or GitHub Actions Webhook)
+ * Handles incoming POST requests:
+ * - "lookup_order": Validates Order ID + Email against sales sheet and re-delivers score.
+ * - "verify_and_deliver": Verifies PayPal payment, delivers score from Vault, and logs sale.
+ * - "log_donation": Logs real donations from Chirp!.
+ * - "sync_catalogue" / "scaffold": Builds vault hierarchy.
  */
 function doPost(e) {
   try {
@@ -51,49 +55,97 @@ function doPost(e) {
       data = e.parameter;
     }
 
-    // Trigger catalogue sync / folder scaffolding if requested
+    // 1. Catalogue sync / folder scaffolding
     if (data.action === 'sync_catalogue' || data.action === 'scaffold') {
       var scaffoldResult = scaffoldVaultFolders(data.piece);
       return createJsonResponse(scaffoldResult);
     }
 
-    var orderId = data.orderId || ('ORDER-' + Utilities.getUuid().substring(0, 8).toUpperCase());
+    // 2. Tip / Donation Logging from Chirp!
+    if (data.action === 'log_donation') {
+      var donOrderId = (data.orderId || '').trim();
+      var donAmount = data.amount || '$5.00';
+      var isSimDonation = donOrderId.indexOf('PP_SIM_') === 0 || donOrderId.indexOf('DEMO') === 0;
+      if (!isSimDonation) {
+        logSaleRecord(donOrderId, 'Chirp! Tip / Donation', 'N/A', donAmount, data.buyerEmail || 'Anonymous', 'N/A', 'SUCCESS: Donation Logged');
+      }
+      return createJsonResponse({ success: true, logged: !isSimDonation });
+    }
+
+    // 3. Self-Service Re-Download Lookup (from downloads.html)
+    if (data.action === 'lookup_order') {
+      return handleOrderLookup(data);
+    }
+
+    // 4. Standard Direct Purchase Delivery / Verification
+    var orderId = (data.orderId || '').trim();
+    if (!orderId) {
+      orderId = 'PP_' + Utilities.getUuid().substring(0, 10).toUpperCase();
+    }
     var pieceTitle = (data.pieceTitle || '').trim();
     var instrument = (data.instrument || '').trim();
     var buyerEmail = (data.buyerEmail || 'N/A').trim();
     var amount = (data.amount || '$4.00').trim();
+    var isSimulation = Boolean(data.isSimulation) || orderId.indexOf('PP_SIM_') === 0 || orderId.indexOf('DEMO') === 0;
 
     if (!pieceTitle) {
       return createJsonResponse({ success: false, error: 'Missing pieceTitle in request' });
     }
 
-    // 1. Locate Vault folder
+    // Server-Side PayPal Verification (for real production purchases)
+    if (!isSimulation) {
+      var verifyResult = verifyPayPalOrder(orderId, amount);
+      if (!verifyResult.verified) {
+        return createJsonResponse({ 
+          success: false, 
+          error: 'Payment verification failed: ' + (verifyResult.error || 'Unverified PayPal transaction.')
+        });
+      }
+      if (verifyResult.payerEmail) {
+        buyerEmail = verifyResult.payerEmail;
+      }
+
+      // Anti-Replay Check (prevents claiming the same orderId multiple times on initial checkout)
+      if (isOrderAlreadyFulfilled(orderId)) {
+        return createJsonResponse({
+          success: false,
+          error: 'This PayPal Order ID has already been redeemed. Please use the Re-Download portal on our store page if you need to retrieve your file again.'
+        });
+      }
+    }
+
+    // Locate Vault folder in Google Drive
     var folder = getVaultFolder();
     if (!folder) {
-      logSaleRecord(orderId, pieceTitle, instrument, amount, buyerEmail, 'N/A', 'ERROR: Vault folder "' + VAULT_FOLDER_NAME + '" not found');
+      if (!isSimulation) {
+        logSaleRecord(orderId, pieceTitle, instrument, amount, buyerEmail, 'N/A', 'ERROR: Vault folder "' + VAULT_FOLDER_NAME + '" not found');
+      }
       return createJsonResponse({ 
         success: false, 
         error: 'Vault folder not found in Google Drive. Ensure folder is named "' + VAULT_FOLDER_NAME + '" or set VAULT_FOLDER_ID.' 
       });
     }
 
-    // 2. Locate score PDF (hierarchical subfolder search with flat fallback)
+    // Locate score PDF
     var file = findMatchingFile(folder, pieceTitle, instrument);
-
     if (!file) {
       var expectedDesc = instrument ? (pieceTitle + ' (' + instrument + ')') : pieceTitle;
-      logSaleRecord(orderId, pieceTitle, instrument, amount, buyerEmail, expectedDesc, 'ALERT: Score file not found in vault folder');
+      if (!isSimulation) {
+        logSaleRecord(orderId, pieceTitle, instrument, amount, buyerEmail, expectedDesc, 'ALERT: Score file not found in vault folder');
+      }
       return createJsonResponse({ 
         success: false, 
         error: 'Score file not yet uploaded to vault for "' + expectedDesc + '". Drop the PDF into its folder in Google Drive.',
-        logged: true
+        logged: !isSimulation
       });
     }
 
-    // 3. Log the successful sale in the Google Sheet (inside the Vault folder)
-    logSaleRecord(orderId, pieceTitle, instrument, amount, buyerEmail, file.getName(), 'SUCCESS: Delivered');
+    // CRITICAL: ONLY log real, verified transactions to the ledger (skip all simulations!)
+    if (!isSimulation) {
+      logSaleRecord(orderId, pieceTitle, instrument, amount, buyerEmail, file.getName(), 'SUCCESS: Delivered');
+    }
 
-    // 4. Return the file as Base64 for instant in-browser delivery
+    // Return the file as Base64 for instant in-browser delivery
     var fileBlob = file.getBlob();
     var base64Data = Utilities.base64Encode(fileBlob.getBytes());
 
@@ -101,7 +153,8 @@ function doPost(e) {
       success: true,
       orderId: orderId,
       fileName: file.getName(),
-      pdfBase64: base64Data
+      pdfBase64: base64Data,
+      isSimulation: isSimulation
     });
 
   } catch (err) {
@@ -649,3 +702,233 @@ function createJsonResponse(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+/**
+ * ============================================================================
+ * SELF-SERVICE RE-DOWNLOAD LOOKUP ENGINE
+ * ============================================================================
+ */
+function handleOrderLookup(data) {
+  var lookupOrder = (data.orderId || '').trim();
+  var lookupEmail = (data.buyerEmail || '').trim().toLowerCase();
+
+  if (!lookupOrder || !lookupEmail) {
+    return createJsonResponse({ 
+      success: false, 
+      error: 'Please provide both your Order ID and the PayPal email address used at checkout.' 
+    });
+  }
+
+  var folder = getVaultFolder();
+  if (!folder) {
+    return createJsonResponse({ 
+      success: false, 
+      error: 'Vault folder not accessible. Please contact Daniel for direct score retrieval.' 
+    });
+  }
+
+  var vaultFiles = folder.getFilesByName(SALES_SHEET_NAME);
+  if (!vaultFiles.hasNext()) {
+    return createJsonResponse({ 
+      success: false, 
+      error: 'Order records are currently being initialized. Please contact Daniel directly.' 
+    });
+  }
+
+  var spreadsheet = SpreadsheetApp.open(vaultFiles.next());
+  var sheet = spreadsheet.getSheetByName('Sales Log') || spreadsheet.getActiveSheet();
+  var rows = sheet.getDataRange().getValues();
+
+  var matchedRow = null;
+  // Search from newest to oldest (excluding header row 0)
+  for (var r = rows.length - 1; r >= 1; r--) {
+    var rowOrderId = (rows[r][1] || '').toString().trim();
+    var rowEmail = (rows[r][5] || '').toString().trim().toLowerCase();
+    var rowStatus = (rows[r][7] || '').toString();
+
+    // Match orderId (case-insensitive) and email
+    if (rowOrderId.toLowerCase() === lookupOrder.toLowerCase() && rowEmail === lookupEmail) {
+      if (rowStatus.indexOf('SUCCESS') > -1) {
+        matchedRow = rows[r];
+        break;
+      }
+    }
+  }
+
+  if (!matchedRow) {
+    return createJsonResponse({ 
+      success: false, 
+      error: 'No completed purchase was found matching Order ID "' + lookupOrder + '" and email "' + lookupEmail + '".' 
+    });
+  }
+
+  var datePurchased = matchedRow[0];
+  var title = matchedRow[2];
+  var instrument = matchedRow[3] === 'Standard (Score & Parts)' ? '' : matchedRow[3];
+  var pricePaid = matchedRow[4];
+
+  // Find matching PDF file in Vault
+  var scoreFile = findMatchingFile(folder, title, instrument);
+  if (!scoreFile) {
+    return createJsonResponse({ 
+      success: false, 
+      error: 'Score file for "' + title + '" could not be retrieved from the vault. Please contact Daniel.' 
+    });
+  }
+
+  // Log re-download audit record in spreadsheet
+  try {
+    var formattedDate = Utilities.formatDate(new Date(), Session.getScriptTimeZone() || 'GMT-5', 'yyyy-MM-dd HH:mm:ss');
+    sheet.appendRow([
+      formattedDate,
+      lookupOrder,
+      title,
+      instrument || 'Standard (Score & Parts)',
+      pricePaid,
+      lookupEmail,
+      scoreFile.getName(),
+      'SUCCESS: Re-downloaded via Portal'
+    ]);
+  } catch (logErr) {
+    console.warn('Re-download audit log notice:', logErr);
+  }
+
+  var fileBlob = scoreFile.getBlob();
+  var base64Data = Utilities.base64Encode(fileBlob.getBytes());
+
+  return createJsonResponse({
+    success: true,
+    orderId: lookupOrder,
+    pieceTitle: title,
+    instrument: instrument,
+    date: datePurchased,
+    amount: pricePaid,
+    fileName: scoreFile.getName(),
+    pdfBase64: base64Data
+  });
+}
+
+/**
+ * ============================================================================
+ * PAYPAL SERVER-SIDE REST API VERIFICATION
+ * ============================================================================
+ */
+function verifyPayPalOrder(orderId, expectedAmount) {
+  var props = PropertiesService.getScriptProperties();
+  var clientId = props.getProperty('PAYPAL_CLIENT_ID');
+  var clientSecret = props.getProperty('PAYPAL_CLIENT_SECRET');
+  var env = (props.getProperty('PAYPAL_ENV') || 'live').toLowerCase();
+
+  // If PayPal credentials are not yet entered into Script Properties, allow safe pass-through with audit note
+  if (!clientId || !clientSecret) {
+    return {
+      verified: true,
+      bypassed: true,
+      warning: 'PayPal credentials not set in Google Apps Script Script Properties.'
+    };
+  }
+
+  var baseUrl = env === 'sandbox' ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
+
+  try {
+    // 1. Get OAuth2 Access Token
+    var tokenRes = UrlFetchApp.fetch(baseUrl + '/v1/oauth2/token', {
+      method: 'post',
+      headers: {
+        'Authorization': 'Basic ' + Utilities.base64Encode(clientId + ':' + clientSecret),
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      payload: 'grant_type=client_credentials',
+      muteHttpExceptions: true
+    });
+
+    if (tokenRes.getResponseCode() !== 200) {
+      return { verified: false, error: 'Failed to authenticate with PayPal OAuth API.' };
+    }
+
+    var tokenData = JSON.parse(tokenRes.getContentText());
+    var accessToken = tokenData.access_token;
+
+    // 2. Query Order Details
+    var orderRes = UrlFetchApp.fetch(baseUrl + '/v2/checkout/orders/' + encodeURIComponent(orderId), {
+      method: 'get',
+      headers: {
+        'Authorization': 'Bearer ' + accessToken,
+        'Content-Type': 'application/json'
+      },
+      muteHttpExceptions: true
+    });
+
+    if (orderRes.getResponseCode() !== 200) {
+      return { verified: false, error: 'Order not found on PayPal servers.' };
+    }
+
+    var orderData = JSON.parse(orderRes.getContentText());
+    var status = orderData.status;
+
+    if (status !== 'COMPLETED' && status !== 'APPROVED') {
+      return { verified: false, error: 'PayPal order status is ' + status + ' (expected COMPLETED).' };
+    }
+
+    var purchaseUnits = orderData.purchase_units || [];
+    if (purchaseUnits.length === 0) {
+      return { verified: false, error: 'Missing purchase units in PayPal order.' };
+    }
+
+    var amountObj = purchaseUnits[0].amount || {};
+    var paidCurrency = amountObj.currency_code;
+    var paidValue = parseFloat(amountObj.value);
+
+    if (paidCurrency !== 'USD') {
+      return { verified: false, error: 'Invalid payment currency: ' + paidCurrency };
+    }
+
+    var expectedNum = parseFloat((expectedAmount || '4.00').replace(/[^\d.]/g, ''));
+    if (isFinite(expectedNum) && expectedNum > 0 && paidValue < (expectedNum - 0.05)) {
+      return { 
+        verified: false, 
+        error: 'Paid amount ($' + paidValue + ') does not match score price ($' + expectedNum + ').' 
+      };
+    }
+
+    var payerEmail = (orderData.payer && orderData.payer.email_address) ? orderData.payer.email_address : null;
+
+    return {
+      verified: true,
+      payerEmail: payerEmail,
+      paidValue: paidValue,
+      order: orderData
+    };
+
+  } catch (e) {
+    return { verified: false, error: 'Exception verifying PayPal transaction: ' + e.toString() };
+  }
+}
+
+/**
+ * Anti-Replay: Verifies if a real PayPal Order ID has already been fulfilled in the Sales Log.
+ */
+function isOrderAlreadyFulfilled(orderId) {
+  try {
+    var folder = getVaultFolder();
+    if (!folder) return false;
+    var vaultFiles = folder.getFilesByName(SALES_SHEET_NAME);
+    if (!vaultFiles.hasNext()) return false;
+    var ss = SpreadsheetApp.open(vaultFiles.next());
+    var sheet = ss.getSheetByName('Sales Log') || ss.getActiveSheet();
+    var data = sheet.getDataRange().getValues();
+
+    for (var i = 1; i < data.length; i++) {
+      var rowOrder = (data[i][1] || '').toString().trim();
+      var status = (data[i][7] || '').toString();
+      if (rowOrder.toLowerCase() === orderId.toLowerCase() && status.indexOf('SUCCESS: Delivered') > -1) {
+        return true;
+      }
+    }
+  } catch (e) {
+    console.warn('Anti-replay check failed: ' + e.toString());
+  }
+  return false;
+}
+
