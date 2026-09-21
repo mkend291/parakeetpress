@@ -3,48 +3,191 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Avian Inspiration | Parakeet Press</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>Chirp! | Parakeet Press</title>
   <link rel="stylesheet" href="style.css?v=2.2">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://www.paypal.com/sdk/js?client-id=BAA37MtKZcpBt2eBehsdQcuRBDiHFRglLNOEvOJddSxHbiecamzRPIsnsAxKjzVTpZOp0jhbA2EgATnTGA&currency=USD" data-sdk-integration-source="button-factory"></script>
   <style>
-    .birds-section {
-      max-width: 750px;
-      margin: 2rem auto;
+    .donate-container {
+      max-width: 660px;
+      margin: 2.5rem auto;
       text-align: center;
       background: var(--bg-surface);
       border-radius: var(--radius-lg);
       box-shadow: var(--shadow-card);
       border: 1px solid var(--border-subtle);
-      padding: 2.5rem 2rem;
+      padding: 2.4rem 2rem;
     }
+
+    .donate-container h2 {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      color: var(--text-primary);
+      margin: 0 0 1rem 0;
+    }
+
+    .donate-text {
+      line-height: 1.7;
+      color: var(--text-primary);
+      max-width: 520px;
+      margin: 0 auto 1.8rem auto;
+      font-size: 1.02rem;
+    }
+
+    .amount-input-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .amount-input-row label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .amount-input-box {
+      display: inline-flex;
+      align-items: center;
+      background: var(--bg-elevated);
+      border: 1.5px solid var(--border-medium);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.65rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .amount-input-box:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+      background: #fff;
+    }
+
+    .currency-symbol {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--primary);
+      margin-right: 0.25rem;
+    }
+
+    .amount-field {
+      width: 85px;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      outline: none;
+      text-align: left;
+    }
+
+    .currency-cents {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-left: 0.15rem;
+    }
+
+    .paypal-wrapper {
+      max-width: 320px;
+      margin: 0 auto;
+      min-height: 90px;
+    }
+
+    .simulate-row {
+      margin-top: 0.8rem;
+    }
+
+    .simulate-text-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      text-decoration: underline;
+      cursor: pointer;
+      font-family: inherit;
+      padding: 0.3rem 0.6rem;
+      transition: color 0.2s ease;
+    }
+
+    .simulate-text-btn:hover {
+      color: var(--primary-dark);
+    }
+
+    .donation-success {
+      background: #fdfbf7;
+      border: 1.5px solid var(--accent);
+      border-radius: var(--radius-md);
+      padding: 1.8rem 1.2rem;
+      margin-bottom: 2rem;
+      animation: fadeInSuccess 0.25s ease-out;
+    }
+
+    @keyframes fadeInSuccess {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .donation-success h3 {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      color: var(--primary-dark);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .donation-success p {
+      font-size: 1.05rem;
+      color: var(--text-primary);
+      margin: 0;
+    }
+
     .birds-gallery {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 1.8rem;
-      margin-top: 1.8rem;
+      gap: 1.2rem;
+      margin: 1.2rem auto 1.5rem auto;
     }
+
     .bird-pic-frame {
       background: var(--bg-elevated);
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-subtle);
       border: 1px solid var(--border-subtle);
-      padding: 0.7rem;
+      padding: 0.6rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
+
     .bird-pic-frame:hover {
-      transform: translateY(-4px) rotate(-1deg);
+      transform: translateY(-3px);
       box-shadow: var(--shadow-hover);
     }
+
     .bird-pic-frame img {
-      max-width: 200px;
-      max-height: 200px;
+      width: 145px;
+      height: 145px;
       border-radius: var(--radius-sm);
       background: #fff;
       object-fit: cover;
+    }
+
+    @media (max-width: 600px) {
+      .donate-container {
+        margin: 1.5rem auto;
+        padding: 1.8rem 1.2rem;
+      }
+      .bird-pic-frame img {
+        width: 130px;
+        height: 130px;
+      }
     }
   </style>
 </head>
@@ -60,18 +203,17 @@
           <li><a href="index.html" class="nav-link">Home</a></li>
           <li><a href="services.html" class="nav-link">Services</a></li>
           <li><a href="store.html" class="nav-link">Store</a></li>
+          <li><a href="chirp.html" class="nav-link active">Chirp!</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
   <main>
-    <div class="birds-section">
-      <h2>The Parakeets of Parakeet Press</h2>
-      <p class="section-subtitle">Musical Inspiration & Studio Companions</p>
-      <p style="line-height:1.7;color:var(--text-primary);max-width:600px;margin:0 auto 1.5rem auto;">
-        Parakeet Press was named in honor of our feathered companions whose cheerful morning chirps and playful personalities bring endless warmth to the composing studio.
-      </p>
+    <div class="donate-container">
+      <h2>Help Feed the Birds!</h2>
+
+      <!-- Bird Photos (Directly below the title) -->
       <div class="birds-gallery">
         <div class="bird-pic-frame">
           <img src="pp_files/PP_Birds1.jpg" alt="Parakeet companion 1">
@@ -83,8 +225,41 @@
           <img src="pp_files/PP_Birds3.jpg" alt="Parakeet companion 3">
         </div>
       </div>
-      <div style="margin-top:2rem;">
-        <a href="store.html" class="buy-btn" style="width:auto;display:inline-block;padding:0.6rem 1.8rem;">Explore the Sheet Music Catalog &rarr;</a>
+
+      <!-- Revised Paragraph -->
+      <p class="donate-text">
+        If you enjoyed my music, services, or resources, please consider leaving a donation. Thank you for your support!
+      </p>
+
+      <!-- Donation Input & PayPal Buttons -->
+      <div id="donate-form-wrapper">
+        <div class="amount-input-row">
+          <label for="donation-amount">Donation Amount:</label>
+          <div class="amount-input-box">
+            <span class="currency-symbol">$</span>
+            <input type="number" id="donation-amount" min="1" step="1" value="5" placeholder="5" aria-label="Donation amount in whole dollars">
+            <span class="currency-cents">.00</span>
+          </div>
+        </div>
+
+        <div id="paypal-donate-button-container" class="paypal-wrapper"></div>
+
+        <div id="admin-simulation-row" class="simulate-row" style="display: none;">
+          <button type="button" id="simulate-donation-btn" class="simulate-text-btn">
+            Simulate Donation
+          </button>
+        </div>
+      </div>
+
+      <!-- Success State -->
+      <div id="donation-success-card" class="donation-success" style="display: none;">
+        <h3>Thank You for Your Support!</h3>
+        <p>Your donation of <strong id="success-confirmed-amount">$5.00</strong> was received with gratitude.</p>
+        <div style="margin-top: 1.2rem;">
+          <button type="button" id="tip-again-btn" class="pagination-btn" style="padding: 0.5rem 1.2rem;">
+            Donate Again
+          </button>
+        </div>
       </div>
     </div>
   </main>
@@ -94,13 +269,159 @@
   </footer>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
+      const amountInput = document.getElementById('donation-amount');
+      const formWrapper = document.getElementById('donate-form-wrapper');
+      const successCard = document.getElementById('donation-success-card');
+      const successAmount = document.getElementById('success-confirmed-amount');
+      const simulateBtn = document.getElementById('simulate-donation-btn');
+      const tipAgainBtn = document.getElementById('tip-again-btn');
+      const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzbHp_SGN3TE1e-rKMGqLfjZcXmz6MDzOdqZeMb0x1bcr1ac3Tq9Hhy1O_dkJAyU_gVoA/exec';
+
+      let paypalButtonsRendered = false;
+
+      function getAmount() {
+        if (!amountInput) return 5;
+        let val = parseInt(amountInput.value, 10);
+        if (isNaN(val) || val < 1) val = 1;
+        return val;
+      }
+
+      function handleSuccess(amountStr, orderId) {
+        if (formWrapper) formWrapper.style.display = 'none';
+        if (successCard) {
+          successCard.style.display = 'block';
+          successCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        if (successAmount) successAmount.textContent = amountStr;
+
+        if (GOOGLE_APPS_SCRIPT_URL && GOOGLE_APPS_SCRIPT_URL.startsWith('http')) {
+          try {
+            fetch(GOOGLE_APPS_SCRIPT_URL, {
+              method: 'POST',
+              mode: 'cors',
+              headers: { 'Content-Type': 'text/plain' },
+              body: JSON.stringify({
+                action: 'log_donation',
+                orderId: orderId || `PP_DONATION_${Date.now()}`,
+                amount: amountStr
+              })
+            }).catch(e => console.warn('Non-blocking Apps Script log:', e));
+          } catch(e) {}
+        }
+      }
+
+      if (simulateBtn) {
+        simulateBtn.addEventListener('click', function() {
+          const amt = getAmount();
+          handleSuccess(`$${amt}.00`, `PP_SIM_${Date.now()}`);
+        });
+      }
+
+      if (tipAgainBtn) {
+        tipAgainBtn.addEventListener('click', function() {
+          if (successCard) successCard.style.display = 'none';
+          if (formWrapper) formWrapper.style.display = 'block';
+        });
+      }
+
+      // Admin / Simulation Visibility (Hidden on live site unless admin)
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('admin') === 'true' || urlParams.get('admin') === '1') {
+        localStorage.setItem('parakeet_admin', 'true');
+      }
+      const isAdmin = isLocal || localStorage.getItem('parakeet_admin') === 'true';
+
+      const simContainer = document.getElementById('admin-simulation-row');
+      if (simContainer && isAdmin) {
+        simContainer.style.display = 'block';
+      }
+
+      // Secret toggle: Clicking the title 3 times toggles Admin Mode on/off
+      const titleEl = document.querySelector('.donate-container h2');
+      if (titleEl) {
+        let clicks = 0;
+        let timer = null;
+        titleEl.style.userSelect = 'none';
+        titleEl.addEventListener('click', function() {
+          clicks++;
+          clearTimeout(timer);
+          timer = setTimeout(() => { clicks = 0; }, 600);
+          if (clicks >= 3) {
+            clicks = 0;
+            const currentlyAdmin = localStorage.getItem('parakeet_admin') === 'true';
+            if (currentlyAdmin) {
+              localStorage.removeItem('parakeet_admin');
+              if (simContainer) simContainer.style.display = 'none';
+              alert('Store Owner Test Mode: DISABLED (hidden from view)');
+            } else {
+              localStorage.setItem('parakeet_admin', 'true');
+              if (simContainer) simContainer.style.display = 'block';
+              alert('Store Owner Test Mode: ENABLED (visible on this device)');
+            }
+          }
+        });
+      }
+
+      function initPayPal() {
+        if (paypalButtonsRendered) return;
+        if (!window.paypal || !window.paypal.Buttons) {
+          console.warn('PayPal JS SDK not ready.');
+          return;
+        }
+
+        paypalButtonsRendered = true;
+        const container = document.getElementById('paypal-donate-button-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        window.paypal.Buttons({
+          style: {
+            layout: 'vertical',
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal'
+          },
+          createOrder: function(data, actions) {
+            const amt = getAmount();
+            return actions.order.create({
+              purchase_units: [{
+                description: 'Parakeet Press Donation',
+                amount: {
+                  currency_code: 'USD',
+                  value: amt.toFixed(2)
+                }
+              }]
+            });
+          },
+          onApprove: function(data, actions) {
+            return actions.order.capture().then(function(details) {
+              const amt = getAmount();
+              handleSuccess(`$${amt}.00`, details.id);
+            });
+          },
+          onError: function(err) {
+            console.error('PayPal checkout error:', err);
+            alert('Unable to load PayPal popup. You can click "Simulate Donation" to test.');
+          }
+        }).render('#paypal-donate-button-container');
+      }
+
+      if (window.paypal && window.paypal.Buttons) {
+        initPayPal();
+      } else {
+        window.addEventListener('load', function() {
+          initPayPal();
+        });
+      }
+
       var year = new Date().getFullYear();
       var copyright = document.getElementById('copyright');
       if (copyright) {
         copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
       }
-    });
+    })();
   </script>
 </body>
 </html>

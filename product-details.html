@@ -6,6 +6,179 @@
   <title>Score Details | Parakeet Press</title>
   <link rel="stylesheet" href="style.css?v=2.2">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- PayPal JavaScript SDK -->
+  <script src="https://www.paypal.com/sdk/js?client-id=BAA37MtKZcpBt2eBehsdQcuRBDiHFRglLNOEvOJddSxHbiecamzRPIsnsAxKjzVTpZOp0jhbA2EgATnTGA&currency=USD" data-sdk-integration-source="button-factory"></script>
+  <!-- PDF-LIB for dynamic Invoice Cover Page generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <style>
+    .direct-purchase-panel {
+      margin-top: 1.5rem;
+      padding-top: 1.4rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .direct-instrument-picker {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      padding: 0.9rem 1.2rem;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+    .direct-instrument-picker label {
+      font-weight: 600;
+      color: var(--primary-dark);
+      font-size: 0.98rem;
+    }
+    .direct-instrument-picker select {
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--primary);
+      font-family: inherit;
+      font-size: 0.98rem;
+      background: #fff;
+      color: var(--text-primary);
+      cursor: pointer;
+      min-width: 220px;
+    }
+    .detail-actions-row {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+    .btn-direct-primary {
+      background: #0070ba;
+      color: #ffffff !important;
+      border: 1px solid #005a96;
+      padding: 0.75rem 1.8rem;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 112, 186, 0.25);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: inherit;
+      text-decoration: none;
+    }
+    .btn-direct-primary:hover {
+      background: #005ea6;
+      box-shadow: 0 4px 14px rgba(0, 112, 186, 0.35);
+      transform: translateY(-1px);
+    }
+    #request-custom-edition-btn {
+      background: #5a3f35 !important; /* Signature dark brown matching navbar */
+      color: #ffffff !important;
+      border: 1.5px solid var(--accent) !important;
+      box-shadow: 0 2px 8px rgba(90, 63, 53, 0.25) !important;
+    }
+    #request-custom-edition-btn:hover {
+      background: #463028 !important;
+      border-color: #f3d79b !important;
+      box-shadow: 0 4px 14px rgba(90, 63, 53, 0.4) !important;
+      transform: translateY(-1px);
+    }
+    .action-btn-fade-in {
+      animation: actionBtnFade 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes actionBtnFade {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .checking-skeleton {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.72rem 1.4rem;
+      background: var(--bg-elevated);
+      border: 1px dashed var(--border-medium);
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+      user-select: none;
+    }
+    .checkout-drawer {
+      margin-top: 1.4rem;
+      background: var(--bg-surface);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-hover);
+      animation: fadeInDrawer 0.22s ease-out;
+    }
+    @keyframes fadeInDrawer {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .success-download-card {
+      margin-top: 1.4rem;
+      background: #f3faf5;
+      border: 2px solid #2f855a;
+      border-radius: var(--radius-md);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      box-shadow: var(--shadow-hover);
+      animation: fadeInDrawer 0.25s ease-out;
+    }
+    .success-check-badge {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #2f855a;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 0.8rem;
+    }
+    .download-action-btn {
+      background: #276749 !important;
+      border-color: #1c4d37 !important;
+      color: #fff !important;
+      font-size: 1.12rem !important;
+      padding: 0.85rem 2rem !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.6rem !important;
+      text-decoration: none !important;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(39, 103, 73, 0.35) !important;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .download-action-btn:hover {
+      background: #1c4d37 !important;
+      transform: translateY(-2px);
+    }
+    .contact-text-link {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0.4rem 0.2rem;
+      font-family: inherit;
+    }
+    .contact-text-link:hover {
+      color: var(--primary-dark);
+    }
+  </style>
 </head>
 <body>
   <header class="navbar">
@@ -19,6 +192,7 @@
           <li><a href="index.html" class="nav-link">Home</a></li>
           <li><a href="services.html" class="nav-link">Services</a></li>
           <li><a href="store.html" class="nav-link active">Store</a></li>
+          <li><a href="chirp.html" class="nav-link">Chirp!</a></li>
         </ul>
       </nav>
     </div>
@@ -49,6 +223,74 @@
         copyright.innerHTML = `&copy; ${year} Parakeet Press. All rights reserved.`;
       }
     });
+
+    // Google Apps Script Engine Web App URL (Centralized)
+    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzbHp_SGN3TE1e-rKMGqLfjZcXmz6MDzOdqZeMb0x1bcr1ac3Tq9Hhy1O_dkJAyU_gVoA/exec";
+
+    function isPieceMultiParts(p) {
+      if (!p) return false;
+      const raw = (p.multipleParts || '').trim();
+      const link = (p.buyLink || '').trim();
+      return Boolean((raw && raw.match(/\.csv$/i) && raw.toLowerCase() !== 'false') || (link && link.includes('solo-arr-catalogue.csv')));
+    }
+
+    function isPieceMultiTrans(p) {
+      if (!p) return false;
+      const raw = (p.multipleTranspositions || '').trim();
+      const link = (p.buyLink || '').trim();
+      return Boolean((raw && raw.match(/\.csv$/i) && raw.toLowerCase() !== 'false') || (link && link.includes('multiple-transpositions.csv')));
+    }
+
+    function pieceHasVendorLink(p) {
+      if (!p) return false;
+      const link = (p.buyLink || '').trim();
+      const isContact = (p.buyMethod || '').trim().toLowerCase() === 'contact daniel';
+      return Boolean(link && /^https?:\/\//i.test(link) && !isContact);
+    }
+
+    function detectVendorName(url, fallback) {
+      if (url) {
+        if (url.includes('sheetmusicplus.com')) return 'Sheet Music Plus';
+        if (url.includes('sheetmusicdirect.com')) return 'Sheet Music Direct';
+        if (url.includes('arrangeme.com')) return 'ArrangeMe';
+      }
+      if (fallback) {
+        const fb = fallback.trim();
+        if (fb.toLowerCase() === 'sheetmusicplus') return 'Sheet Music Plus';
+        if (fb.toLowerCase() === 'sheetmusicdirect') return 'Sheet Music Direct';
+        if (fb.toLowerCase() !== 'contact daniel' && fb.toLowerCase() !== 'n/a') return fb;
+      }
+      return 'Sheet Music Plus';
+    }
+
+    function calculateAlgorithmicDirectPrice(p) {
+      const rawVendor = parseFloat(((p && p.price) || '').replace(/[^\d.]/g, ''));
+      if (!isFinite(rawVendor) || rawVendor <= 0) return '$4.00';
+
+      const isCopyright = ((p && p.priceNotes) || '').toLowerCase().includes('copyright');
+      const smpRate = isCopyright ? 0.10 : 0.50;
+      const smpNet = rawVendor * smpRate;
+      
+      // Target profit bonus: at least $0.50 (for < $10 items) or $1.00 (for >= $10 items) more than SMP
+      const targetBonus = rawVendor < 10.0 ? 0.50 : 1.00;
+      
+      // Breakeven price after PayPal standard merchant fee (3.49% + $0.49)
+      const minPriceNeeded = (smpNet + targetBonus + 0.49) / 0.9651;
+      
+      // Target an attractive 30% to 35% discount for the buyer
+      const targetDiscountPrice = rawVendor * (isCopyright ? 0.60 : 0.67);
+      
+      // Take the higher of minimum profitability or discount target, snap to whole dollar
+      let calculatedWholeDollar = Math.max(Math.ceil(minPriceNeeded), Math.round(targetDiscountPrice));
+      
+      // Ensure the buyer always receives a discount vs vendor price
+      if (calculatedWholeDollar >= rawVendor) {
+        calculatedWholeDollar = Math.floor(rawVendor);
+      }
+      if (calculatedWholeDollar < 1) calculatedWholeDollar = 1;
+
+      return `$${calculatedWholeDollar}.00`;
+    }
 
     // Robust CSV parser for quoted fields
     function parseCSV(text) {
@@ -122,7 +364,8 @@
 
       let buyBtn = `<button class="buy-btn secondary-btn" type="button" id="open-email-modal">Contact Daniel to Order Direct</button>`;
       const buyLink = hideIfNA(p.buyLink);
-      const btnText = (p.buyMethod && p.buyMethod.trim()) ? p.buyMethod : 'Buy Score via Vendor';
+      const vendorDisplayName = detectVendorName(buyLink, p.buyMethod);
+      const btnText = (p.buyMethod && p.buyMethod.trim().toLowerCase() !== 'contact daniel') ? vendorDisplayName : 'Buy Score via Vendor';
 
       // Multiple Parts (Solo Arrangements)
       const multiplePartsRaw = (p.multipleParts || '').trim();
@@ -149,7 +392,17 @@
                 document.getElementById('multi-parts-block').innerHTML = '<p style="color:var(--text-muted);margin:0;font-style:italic;">Instrumentation editions coming soon.</p>';
                 return;
               }
-              let html = `<div class="multi-parts-title">Available Instrumentation Editions:</div><div class="multi-parts-grid">`;
+              const sampleUrl = Object.values(row).find(v => typeof v === 'string' && /^https?:\/\//i.test(v)) || '';
+              const blockVendorName = detectVendorName(sampleUrl, p.buyMethod);
+              let html = `
+                <div class="multi-parts-title">
+                  <i class="fa-solid fa-arrow-up-right-from-square" style="color:var(--accent);font-size:0.9em;margin-right:6px;"></i>Available Instrumentation Editions on ${blockVendorName} (External Vendor):
+                </div>
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin:0 0 0.75rem 0;line-height:1.4;">
+                  The links below open individual parts on <strong>${blockVendorName}</strong>. <em>(To purchase direct from Parakeet Press with instant PDF delivery, use the dropdown below.)</em>
+                </p>
+                <div class="multi-parts-grid">
+              `;
               let linkCount = 0;
               Object.keys(row).forEach(col => {
                 if (col.toLowerCase() === 'title' || col.toLowerCase() === '\ufefftitle') return;
@@ -157,9 +410,9 @@
                 if (val && val.toLowerCase() !== 'n/a') {
                   linkCount++;
                   if (/^https?:\/\//.test(val)) {
-                    html += `<a href="${val}" target="_blank" rel="noopener" class="instrument-pill">${col} &rarr;</a>`;
+                    html += `<a href="${val}" target="_blank" rel="noopener" class="instrument-pill" title="Purchase ${col} edition on ${blockVendorName}">${col} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.72em;opacity:0.7;margin-left:4px;"></i></a>`;
                   } else {
-                    html += `<span class="instrument-pill" style="opacity:0.5;cursor:not-allowed;">${col}</span>`;
+                    html += `<span class="instrument-pill" style="opacity:0.5;cursor:not-allowed;" title="Not yet available on ${blockVendorName}">${col}</span>`;
                   }
                 }
               });
@@ -168,6 +421,37 @@
                 html = '<p style="color:var(--text-muted);margin:0;font-style:italic;">Instrumentation editions coming soon.</p>';
               }
               document.getElementById('multi-parts-block').innerHTML = html;
+
+              // Populate the Direct Purchase Instrument Dropdown
+              const instSelect = document.getElementById('direct-instrument-select');
+              const instWrapper = document.getElementById('direct-instrument-wrapper');
+              if (instSelect && instWrapper) {
+                let optionsHtml = '';
+                Object.keys(row).forEach(col => {
+                  if (col.toLowerCase() === 'title' || col.toLowerCase() === '\ufefftitle') return;
+                  const val = (row[col] || '').trim();
+                  if (val && val.toLowerCase() !== 'n/a') {
+                    optionsHtml += `<option value="${col}" data-vendor-url="${val}">${col}</option>`;
+                  }
+                });
+                if (optionsHtml) {
+                  instSelect.innerHTML = optionsHtml;
+                  instWrapper.style.display = 'flex';
+                  window.currentSelectedInstrument = instSelect.value;
+                  const firstOpt = instSelect.selectedOptions[0];
+                  const vendorUrl = firstOpt ? firstOpt.getAttribute('data-vendor-url') : '';
+                  const vendorLinkEl = document.getElementById('vendor-buy-link');
+                  if (vendorLinkEl && vendorUrl && /^https?:\/\//i.test(vendorUrl)) {
+                    vendorLinkEl.href = vendorUrl;
+                    vendorLinkEl.style.display = 'inline-block';
+                  }
+                  const tagEl = document.getElementById('checkout-instrument-tag');
+                  if (tagEl) {
+                    tagEl.textContent = `(${instSelect.value})`;
+                    tagEl.style.display = 'inline';
+                  }
+                }
+              }
             })
             .catch(() => {
               document.getElementById('multi-parts-block').innerHTML = '<span style="color:#b33;">Error loading instrument catalogue.</span>';
@@ -199,7 +483,17 @@
                 document.getElementById('multi-trans-block').innerHTML = '<p style="color:var(--text-muted);margin:0;font-style:italic;">Transposition editions coming soon.</p>';
                 return;
               }
-              let html = `<div class="multi-parts-title">Available Key Transpositions:</div><div class="multi-parts-grid">`;
+              const sampleUrl = Object.values(row).find(v => typeof v === 'string' && /^https?:\/\//i.test(v)) || '';
+              const blockVendorName = detectVendorName(sampleUrl, p.buyMethod);
+              let html = `
+                <div class="multi-parts-title">
+                  <i class="fa-solid fa-arrow-up-right-from-square" style="color:var(--accent);font-size:0.9em;margin-right:6px;"></i>Available Key Editions on ${blockVendorName} (External Vendor):
+                </div>
+                <p style="font-size:0.85rem;color:var(--text-secondary);margin:0 0 0.75rem 0;line-height:1.4;">
+                  The links below open specific transposed keys on <strong>${blockVendorName}</strong>. <em>(To purchase direct from Parakeet Press with instant PDF delivery, use the dropdown below.)</em>
+                </p>
+                <div class="multi-parts-grid">
+              `;
               let linkCount = 0;
               Object.keys(row).forEach(col => {
                 if (col.toLowerCase() === 'title' || col.toLowerCase() === '\ufefftitle') return;
@@ -207,9 +501,9 @@
                 if (val && val.toLowerCase() !== 'n/a') {
                   linkCount++;
                   if (/^https?:\/\//.test(val)) {
-                    html += `<a href="${val}" target="_blank" rel="noopener" class="instrument-pill">${col} &rarr;</a>`;
+                    html += `<a href="${val}" target="_blank" rel="noopener" class="instrument-pill" title="Purchase ${col} key on ${blockVendorName}">${col} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.72em;opacity:0.7;margin-left:4px;"></i></a>`;
                   } else {
-                    html += `<span class="instrument-pill" style="opacity:0.5;cursor:not-allowed;">${col}</span>`;
+                    html += `<span class="instrument-pill" style="opacity:0.5;cursor:not-allowed;" title="Not yet available on ${blockVendorName}">${col}</span>`;
                   }
                 }
               });
@@ -218,16 +512,46 @@
                 html = '<p style="color:var(--text-muted);margin:0;font-style:italic;">Transposition editions coming soon.</p>';
               }
               document.getElementById('multi-trans-block').innerHTML = html;
+
+              // Populate the Direct Purchase Dropdown for Keys if not already populated by parts
+              const instSelect = document.getElementById('direct-instrument-select');
+              const instWrapper = document.getElementById('direct-instrument-wrapper');
+              const instLabel = document.querySelector('label[for="direct-instrument-select"]');
+              if (instSelect && instWrapper && !isMultiplePartsCSV) {
+                if (instLabel) {
+                  instLabel.innerHTML = '<i class="fa-solid fa-key"></i> <strong>Choose Key Edition:</strong>';
+                }
+                let optionsHtml = '';
+                Object.keys(row).forEach(col => {
+                  if (col.toLowerCase() === 'title' || col.toLowerCase() === '\ufefftitle') return;
+                  const val = (row[col] || '').trim();
+                  if (val && val.toLowerCase() !== 'n/a') {
+                    optionsHtml += `<option value="${col}" data-vendor-url="${val}">${col}</option>`;
+                  }
+                });
+                if (optionsHtml) {
+                  instSelect.innerHTML = optionsHtml;
+                  instWrapper.style.display = 'flex';
+                  window.currentSelectedInstrument = instSelect.value;
+                  const firstOpt = instSelect.selectedOptions[0];
+                  const vendorUrl = firstOpt ? firstOpt.getAttribute('data-vendor-url') : '';
+                  const vendorLinkEl = document.getElementById('vendor-buy-link');
+                  if (vendorLinkEl && vendorUrl && /^https?:\/\//i.test(vendorUrl)) {
+                    vendorLinkEl.href = vendorUrl;
+                    vendorLinkEl.style.display = 'inline-block';
+                  }
+                  const tagEl = document.getElementById('checkout-instrument-tag');
+                  if (tagEl) {
+                    tagEl.textContent = `(${instSelect.value})`;
+                    tagEl.style.display = 'inline';
+                  }
+                }
+              }
             })
             .catch(() => {
               document.getElementById('multi-trans-block').innerHTML = '<span style="color:#b33;">Error loading transposition catalogue.</span>';
             });
         }, 0);
-      }
-
-      // Vendor Buy Button (only when an actual external URL exists)
-      if (buyLink && /^https?:\/\//i.test(buyLink)) {
-        buyBtn += ` <a class="buy-btn" href="${buyLink}" target="_blank" rel="noopener">${btnText}</a>`;
       }
 
       let price = '';
@@ -236,7 +560,10 @@
         price = !isNaN(priceNum) ? `$${priceNum.toFixed(2)}` : p.price.trim();
       }
 
-      let directPrice = p.directPrice && hideIfNA(p.directPrice) ? p.directPrice : '';
+      // Algorithmic Direct Pricing: overrides manual CSV values to enforce consistent whole-dollar incentives
+      const directPrice = calculateAlgorithmicDirectPrice(p);
+      p.directPrice = directPrice; // Keep in sync across all checkout modals, PayPal buttons, and invoices
+
       let percentOff = '';
       if (price && directPrice) {
         const vendorNum = parseFloat(price.replace(/[^\d.]/g, ''));
@@ -246,7 +573,104 @@
           percentOff = ` (${pct}% off)`;
         }
       }
-      if (directPrice && !directPrice.startsWith('$')) directPrice = `$${directPrice}`;
+
+      // Check eligibility for Direct PayPal purchase:
+      // Must have an active external vendor link (e.g. SheetMusicPlus) or be a multi-part catalogue item.
+      // If the only option is Contact Daniel (or buyLink is n/a), PayPal is NOT shown.
+      const isContactMethod = (p.buyMethod || '').trim().toLowerCase() === 'contact daniel';
+      const hasVendorLink = Boolean(buyLink && /^https?:\/\//i.test(buyLink) && !isContactMethod);
+
+      const effectiveDirectPrice = directPrice;
+      const displayVendorPrice = price ? ` (${price})` : '';
+
+      const purchaseActionsHtml = `
+        <div class="direct-purchase-panel">
+          <!-- Multi-Instrument Selector (for pieces with individual solo parts) -->
+          <div id="direct-instrument-wrapper" class="direct-instrument-picker" style="display:none;">
+            <label for="direct-instrument-select"><i class="fa-solid fa-music"></i> <strong>Choose Instrument Edition:</strong></label>
+            <select id="direct-instrument-select" class="store-select">
+              <option value="">Loading available instruments...</option>
+            </select>
+          </div>
+
+          <!-- Side-by-Side Action Buttons -->
+          <div class="detail-actions-row">
+            ${!hasVendorLink ? `
+              <div id="vault-checking-skeleton" class="checking-skeleton">
+                <i class="fa-solid fa-circle-notch fa-spin" style="color:var(--accent);"></i> Checking availability...
+              </div>
+            ` : ''}
+            <button class="btn-direct-primary" id="start-direct-checkout" type="button" style="display:none;">
+              <i class="fa-brands fa-paypal"></i> Buy Direct (<span id="direct-btn-price">${effectiveDirectPrice}</span>)
+            </button>
+            <button class="btn-direct-primary" id="request-custom-edition-btn" type="button" style="display:none;">
+              <i class="fa-solid fa-envelope"></i> <span id="request-edition-label">Request Arrangement from Daniel</span>
+            </button>
+            ${hasVendorLink ? `
+              <a class="buy-btn secondary-btn" id="vendor-buy-link" href="${buyLink}" target="_blank" rel="noopener">
+                Buy on ${btnText}${displayVendorPrice} &rarr;
+              </a>
+            ` : `
+              <button class="buy-btn secondary-btn" id="contact-fallback-btn" type="button" style="display:none;">
+                Contact Daniel to Order Direct
+              </button>
+            `}
+          </div>
+
+          <div id="vault-in-progress-note" style="display:none;margin-top:0.75rem;padding:0.6rem 0.9rem;background:var(--bg-elevated);border-left:3px solid var(--accent);border-radius:4px;font-size:0.85rem;color:var(--text-secondary);">
+            <i class="fa-solid fa-pen-ruler" style="color:var(--accent);margin-right:0.4rem;"></i> Direct PDF score in preparation — available via vendor link or contact Daniel.
+          </div>
+
+          <div style="margin-top:0.6rem;">
+            <button class="contact-text-link" id="open-email-modal" type="button">
+              Have questions or need custom parts? Contact Daniel
+            </button>
+          </div>
+
+          <!-- In-Page PayPal Checkout Drawer -->
+          <div id="direct-checkout-drawer" class="checkout-drawer" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
+              <h4 style="margin:0;color:var(--primary-dark);font-size:1.15rem;">
+                <i class="fa-solid fa-lock" style="color:var(--accent);"></i> Secure Instant Checkout
+              </h4>
+              <button id="close-checkout-drawer" type="button" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--text-muted);">&times;</button>
+            </div>
+            <p style="margin:0 0 1.2rem 0;font-size:0.95rem;color:var(--text-secondary);">
+              Score: <strong id="checkout-piece-title">${escapedTitle}</strong> <span id="checkout-instrument-tag" style="display:none;font-weight:600;color:var(--primary-dark);"></span> &bull; Total: <strong id="checkout-price-display" style="color:var(--primary-dark);">${effectiveDirectPrice}</strong>
+            </p>
+            
+            <!-- PayPal Smart Buttons Container -->
+            <div id="paypal-button-container" style="max-width:420px;margin:0 auto;"></div>
+
+            <!-- Store Owner / Admin Test Simulator (Hidden from regular customers) -->
+            <div id="admin-simulation-container" style="display:none;margin-top:1.2rem;padding-top:1rem;border-top:1px dashed var(--border-subtle);align-items:center;justify-content:space-between;font-size:0.85rem;color:var(--text-muted);flex-wrap:wrap;gap:0.5rem;">
+              <span><i class="fa-solid fa-flask"></i> Store Owner Test Mode:</span>
+              <button id="simulate-purchase-btn" type="button" style="background:var(--bg-elevated);border:1px solid var(--border-medium);border-radius:4px;padding:0.35rem 0.8rem;cursor:pointer;font-size:0.85rem;color:var(--primary-dark);font-weight:600;">
+                Simulate Purchase & Download
+              </button>
+            </div>
+          </div>
+
+          <!-- In-Browser Instant Download Success Card -->
+          <div id="direct-success-card" class="success-download-card" style="display:none;">
+            <div class="success-check-badge">
+              <i class="fa-solid fa-check"></i>
+            </div>
+            <h3 style="margin:0 0 0.4rem 0;color:#205230;">Payment Confirmed!</h3>
+            <p style="margin:0 0 1.4rem 0;color:#356743;font-size:1rem;">
+              Thank you for supporting Daniel! Your score and parts are ready below:
+            </p>
+            <div style="margin-bottom:1.2rem;">
+              <a id="instant-download-btn" href="#" class="download-action-btn" download="${safeTitle}.pdf">
+                <i class="fa-solid fa-file-arrow-down"></i> Download Score & Parts (PDF)
+              </a>
+            </div>
+            <p style="margin:0;font-size:0.88rem;color:#456e50;">
+              <i class="fa-solid fa-circle-check"></i> Purchase recorded (<span id="success-buyer-email"></span>). Your download will start automatically. If it does not, click the button above.
+            </p>
+          </div>
+        </div>
+      `;
 
       return `
         <div class="product-detail-full">
@@ -269,9 +693,7 @@
           ${multiPartsBlock}
           ${multiTransBlock}
 
-          <div class="detail-actions">
-            ${buyBtn}
-          </div>
+          ${purchaseActionsHtml}
 
           <div style="margin-top:1.8rem;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1rem 1.4rem;font-size:0.95rem;color:var(--text-secondary);line-height:1.6;">
             <strong style="color:var(--primary-dark);">Purchasing Direct from Daniel:</strong> Third-party sheet music distributors set high price minimums and take up to 90% of royalties. Ordering directly supports the composer and provides you with personalized engraving, score preparation, and custom transpositions if needed.
@@ -410,7 +832,722 @@
               return false;
             };
           }
+
+          // Direct Checkout Drawer & Button Wiring
+          const startDirectBtn = document.getElementById('start-direct-checkout');
+          const drawer = document.getElementById('direct-checkout-drawer');
+          const closeDrawerBtn = document.getElementById('close-checkout-drawer');
+          const simBtn = document.getElementById('simulate-purchase-btn');
+          const instSelect = document.getElementById('direct-instrument-select');
+
+          function updateMultiPartButtonState(shouldFade) {
+            const directBtn = document.getElementById('start-direct-checkout');
+            const requestBtn = document.getElementById('request-custom-edition-btn');
+            const requestLabel = document.getElementById('request-edition-label');
+            if (!instSelect) return;
+
+            const opt = instSelect.selectedOptions[0];
+            const inVault = opt ? (opt.getAttribute('data-in-vault') === 'true') : true;
+
+            if (inVault) {
+              if (directBtn) {
+                directBtn.style.display = 'inline-flex';
+                if (shouldFade) {
+                  directBtn.classList.remove('action-btn-fade-in');
+                  void directBtn.offsetWidth;
+                  directBtn.classList.add('action-btn-fade-in');
+                }
+              }
+              if (requestBtn) requestBtn.style.display = 'none';
+            } else {
+              if (directBtn) directBtn.style.display = 'none';
+              if (requestBtn) {
+                requestBtn.style.display = 'inline-flex';
+                if (shouldFade) {
+                  requestBtn.classList.remove('action-btn-fade-in');
+                  void requestBtn.offsetWidth;
+                  requestBtn.classList.add('action-btn-fade-in');
+                }
+                const instName = opt ? opt.value : 'Instrument';
+                if (requestLabel) requestLabel.textContent = `Request ${instName} Arrangement`;
+              }
+            }
+          }
+
+          if (instSelect) {
+            instSelect.onchange = function() {
+              window.currentSelectedInstrument = this.value;
+              const opt = this.selectedOptions[0];
+              const vendorUrl = opt ? opt.getAttribute('data-vendor-url') : '';
+              const vendorLinkEl = document.getElementById('vendor-buy-link');
+              if (vendorLinkEl && vendorUrl && /^https?:\/\//i.test(vendorUrl)) {
+                vendorLinkEl.href = vendorUrl;
+                vendorLinkEl.style.display = 'inline-block';
+              }
+              const tagEl = document.getElementById('checkout-instrument-tag');
+              if (tagEl) {
+                tagEl.textContent = `(${this.value})`;
+                tagEl.style.display = 'inline';
+              }
+              updateMultiPartButtonState(true);
+            };
+          }
+
+          // Wire Request Custom Edition Button
+          const requestBtn = document.getElementById('request-custom-edition-btn');
+          const emailModal = document.getElementById('email-modal');
+          if (requestBtn && emailModal) {
+            requestBtn.onclick = function() {
+              const inst = window.currentSelectedInstrument || '';
+              const subjInput = document.getElementById('yourSubject');
+              const msgInput = document.getElementById('yourMsg');
+              if (subjInput) {
+                subjInput.value = `Arrangement Request: ${p.title}${inst ? ' (' + inst + ')' : ''}`;
+              }
+              if (msgInput) {
+                msgInput.value = `Hi Daniel,\n\nI am interested in obtaining the score and parts for "${p.title}" arranged for ${inst || 'this instrument'}.\n\nPlease let me know when this edition is available or if custom parts can be arranged.\n\nThank you!`;
+              }
+              emailModal.classList.add('active');
+            };
+          }
+
+          // Wire up Contact Fallback Button if present
+          const contactFallbackBtn = document.getElementById('contact-fallback-btn');
+          if (contactFallbackBtn && emailModal) {
+            contactFallbackBtn.onclick = function() {
+              emailModal.classList.add('active');
+            };
+          }
+
+          const isMultipleParts = isPieceMultiParts(p);
+          const isMultipleTrans = isPieceMultiTrans(p);
+          const hasVendorLink = pieceHasVendorLink(p);
+
+          // Live Vault Inventory Check (Bypasses cache on localhost / admin mode!)
+          async function fetchVaultAvailability(pieceTitle) {
+            const isDevOrAdmin = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || localStorage.getItem('parakeet_admin') === 'true';
+            const cacheKey = 'pp_avail_' + pieceTitle.toLowerCase().replace(/[^a-z0-9]/g, '');
+            if (!isDevOrAdmin) {
+              try {
+                const cached = sessionStorage.getItem(cacheKey);
+                if (cached) return JSON.parse(cached);
+              } catch (e) {}
+            }
+
+            if (!GOOGLE_APPS_SCRIPT_URL || !GOOGLE_APPS_SCRIPT_URL.startsWith('http')) return null;
+
+            try {
+              const res = await fetch(`${GOOGLE_APPS_SCRIPT_URL}?action=check_piece&piece=${encodeURIComponent(pieceTitle)}`);
+              if (res.ok) {
+                const data = await res.json();
+                if (data && data.success) {
+                  try { sessionStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) {}
+                  return data;
+                }
+              }
+            } catch (err) {
+              console.warn('Vault availability check notice:', err);
+            }
+            return null;
+          }
+
+          fetchVaultAvailability(p.title).then(vaultData => {
+            console.log('Vault check result for "' + p.title + '":', vaultData);
+            const skeleton = document.getElementById('vault-checking-skeleton');
+            if (skeleton) skeleton.style.display = 'none';
+
+            const directBtn = document.getElementById('start-direct-checkout');
+            const noteEl = document.getElementById('vault-in-progress-note');
+            const contactBtn = document.getElementById('contact-fallback-btn');
+            const instWrapper = document.getElementById('direct-instrument-wrapper');
+
+            // Determine if the piece has an active multi-edition picker visible to the customer
+            const hasActiveInstSelect = instSelect && instWrapper && instWrapper.style.display !== 'none' && instSelect.options.length > 1;
+
+            if (!vaultData || !vaultData.success) {
+              if (!hasVendorLink) {
+                if (contactBtn) {
+                  contactBtn.style.display = 'inline-block';
+                  contactBtn.classList.add('action-btn-fade-in');
+                }
+              }
+              return;
+            }
+
+            // 1. Multi-Edition Pieces with active instrument/key dropdown
+            if (hasActiveInstSelect) {
+              const availableSet = new Set((vaultData.availableEditions || []).map(s => s.toLowerCase().replace(/[^a-z0-9]/g, '')));
+              let firstInVaultIndex = -1;
+              for (let i = 0; i < instSelect.options.length; i++) {
+                const opt = instSelect.options[i];
+                if (!opt.value) continue;
+                const cleanOpt = opt.value.toLowerCase().replace(/[^a-z0-9]/g, '');
+                if (availableSet.has(cleanOpt)) {
+                  opt.textContent = `${opt.value} (✓ Instant Download)`;
+                  opt.setAttribute('data-in-vault', 'true');
+                  if (firstInVaultIndex === -1) firstInVaultIndex = i;
+                } else {
+                  opt.textContent = `${opt.value} (On Request)`;
+                  opt.setAttribute('data-in-vault', 'false');
+                }
+              }
+              // If current selection is NOT in vault, but another edition IS in vault, default to the available one!
+              const currentOpt = instSelect.selectedOptions[0];
+              const isCurrentInVault = currentOpt && currentOpt.getAttribute('data-in-vault') === 'true';
+              if (!isCurrentInVault && firstInVaultIndex !== -1) {
+                instSelect.selectedIndex = firstInVaultIndex;
+                window.currentSelectedInstrument = instSelect.value;
+                const tagEl = document.getElementById('checkout-instrument-tag');
+                if (tagEl) {
+                  tagEl.textContent = `(${instSelect.value})`;
+                  tagEl.style.display = 'inline';
+                }
+              }
+              updateMultiPartButtonState(true);
+            } else if (vaultData.availableEditions && vaultData.availableEditions.length > 0) {
+              // 2. Vault has instrument / multi-part editions available, even if not yet mapped in solo-arr-catalogue.csv!
+              if (instSelect && instWrapper) {
+                const preferredOrder = [
+                  'Piccolo', 'Flute', 'Oboe', 'Eng Horn', 'English Horn', 'Clarinet', 'Bass Clarinet', 'Bassoon',
+                  'Sop Sax', 'Soprano Sax', 'Alto Sax', 'Tenor Sax', 'Bari Sax', 'Baritone Sax',
+                  'Horn', 'Trumpet', 'Trombone', 'Euphonium', 'Tuba',
+                  'Violin', 'Viola', 'Cello', 'Bass', 'Double Bass'
+                ];
+                const sortedEditions = [...vaultData.availableEditions].sort((a, b) => {
+                  const cleanA = a.toLowerCase().replace(/[^a-z0-9]/g, '');
+                  const cleanB = b.toLowerCase().replace(/[^a-z0-9]/g, '');
+                  const idxA = preferredOrder.findIndex(p => p.toLowerCase().replace(/[^a-z0-9]/g, '') === cleanA);
+                  const idxB = preferredOrder.findIndex(p => p.toLowerCase().replace(/[^a-z0-9]/g, '') === cleanB);
+                  if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+                  if (idxA !== -1) return -1;
+                  if (idxB !== -1) return 1;
+                  return a.localeCompare(b);
+                });
+
+                let optionsHtml = '';
+                if (vaultData.hasStandaloneScore) {
+                  optionsHtml += `<option value="Full Score" data-in-vault="true">Full Score (✓ Instant Download)</option>`;
+                }
+                sortedEditions.forEach(ed => {
+                  optionsHtml += `<option value="${ed}" data-in-vault="true">${ed} (✓ Instant Download)</option>`;
+                });
+                instSelect.innerHTML = optionsHtml;
+                instWrapper.style.display = 'flex';
+                window.currentSelectedInstrument = instSelect.value;
+
+                const tagEl = document.getElementById('checkout-instrument-tag');
+                if (tagEl) {
+                  tagEl.textContent = `(${instSelect.value})`;
+                  tagEl.style.display = 'inline';
+                }
+              }
+
+              // Update multi-parts-block pills on the page if present
+              const multiBlock = document.getElementById('multi-parts-block');
+              if (multiBlock) {
+                let html = `
+                  <div class="multi-parts-title">
+                    <i class="fa-solid fa-bolt" style="color:var(--accent);font-size:0.9em;margin-right:6px;"></i>Available Direct Editions (Instant Download):
+                  </div>
+                  <p style="font-size:0.85rem;color:var(--text-secondary);margin:0 0 0.75rem 0;line-height:1.4;">
+                    Click any instrument below or select from the dropdown to buy directly via PayPal:
+                  </p>
+                  <div class="multi-parts-grid">
+                `;
+                const displayList = instSelect ? Array.from(instSelect.options).map(o => o.value) : vaultData.availableEditions;
+                displayList.forEach(ed => {
+                  html += `<button type="button" class="instrument-pill" style="border-color:var(--primary);color:var(--text-primary);cursor:pointer;background:transparent;" onclick="const s=document.getElementById('direct-instrument-select');if(s){s.value='${ed}';s.dispatchEvent(new Event('change'));}">${ed} &darr;</button>`;
+                });
+                html += `</div>`;
+                multiBlock.innerHTML = html;
+              }
+
+              if (directBtn) {
+                directBtn.style.display = 'inline-flex';
+                directBtn.classList.add('action-btn-fade-in');
+              }
+              if (contactBtn) contactBtn.style.display = 'none';
+              if (noteEl) noteEl.style.display = 'none';
+            } else {
+              // 3. Standalone Pieces (or pieces without instrument catalogue entries)
+              if (vaultData.hasStandaloneScore) {
+                if (directBtn) {
+                  directBtn.style.display = 'inline-flex';
+                  directBtn.classList.add('action-btn-fade-in');
+                }
+                if (contactBtn) contactBtn.style.display = 'none';
+                if (noteEl) noteEl.style.display = 'none';
+              } else {
+                if (directBtn) directBtn.style.display = 'none';
+                if (hasVendorLink) {
+                  if (noteEl) {
+                    noteEl.style.display = 'block';
+                    noteEl.classList.add('action-btn-fade-in');
+                  }
+                } else {
+                  if (contactBtn) {
+                    contactBtn.style.display = 'inline-block';
+                    contactBtn.classList.add('action-btn-fade-in');
+                  }
+                }
+              }
+            }
+          });
+
+          if (startDirectBtn && drawer) {
+            startDirectBtn.onclick = function() {
+              drawer.style.display = 'block';
+              drawer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+              initPayPalCheckout(p);
+            };
+          }
+
+          if (closeDrawerBtn && drawer) {
+            closeDrawerBtn.onclick = function() {
+              drawer.style.display = 'none';
+            };
+          }
+
+          // Admin Mode detection: localhost OR ?admin=1 OR localStorage('parakeet_admin')
+          try {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('admin') === '1' || urlParams.get('admin') === 'true') {
+              localStorage.setItem('parakeet_admin', 'true');
+            } else if (urlParams.get('admin') === '0' || urlParams.get('admin') === 'false') {
+              localStorage.removeItem('parakeet_admin');
+            }
+
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const isAdmin = isLocal || localStorage.getItem('parakeet_admin') === 'true';
+
+            const adminContainer = document.getElementById('admin-simulation-container');
+            if (adminContainer && isAdmin) {
+              adminContainer.style.display = 'flex';
+            }
+
+            // Secret toggle: Clicking the checkout header 3 times toggles Admin Mode on/off
+            const checkoutHeader = document.querySelector('#direct-checkout-drawer h4');
+            if (checkoutHeader) {
+              let clicks = 0;
+              let timer = null;
+              checkoutHeader.style.userSelect = 'none';
+              checkoutHeader.addEventListener('click', function() {
+                clicks++;
+                clearTimeout(timer);
+                timer = setTimeout(() => { clicks = 0; }, 600);
+                if (clicks >= 3) {
+                  clicks = 0;
+                  const currentlyAdmin = localStorage.getItem('parakeet_admin') === 'true';
+                  if (currentlyAdmin) {
+                    localStorage.removeItem('parakeet_admin');
+                    if (adminContainer) adminContainer.style.display = 'none';
+                    alert('Store Owner Test Mode: DISABLED (hidden from view)');
+                  } else {
+                    localStorage.setItem('parakeet_admin', 'true');
+                    if (adminContainer) adminContainer.style.display = 'flex';
+                    alert('Store Owner Test Mode: ENABLED (visible on this device)');
+                  }
+                }
+              });
+            }
+          } catch (e) {
+            console.warn('Admin check error:', e);
+          }
+
+          if (simBtn) {
+            simBtn.onclick = function() {
+              handleSuccessfulPurchase({
+                orderId: 'PP_' + Date.now().toString(36).toUpperCase(),
+                payerEmail: 'test-musician@example.com',
+                title: p.title,
+                instrument: window.currentSelectedInstrument || '',
+                amount: (p.directPrice || p.price || '$4.00').trim()
+              });
+            };
+          }
         }, 0);
+
+        // ====================================================================
+        // PAYPAL & INSTANT IN-BROWSER DELIVERY ENGINE
+        // ====================================================================
+        let paypalButtonsRendered = false;
+
+        function initPayPalCheckout(product) {
+          if (paypalButtonsRendered) return;
+          if (!window.paypal || !window.paypal.Buttons) {
+            console.warn('PayPal JavaScript SDK not yet ready or blocked.');
+            return;
+          }
+
+          paypalButtonsRendered = true;
+          const container = document.getElementById('paypal-button-container');
+          if (!container) return;
+          container.innerHTML = '';
+
+          const rawPrice = (product.directPrice || product.price || '4.00').replace(/[^\d.]/g, '');
+          const numPrice = parseFloat(rawPrice);
+          const cleanAmount = (isFinite(numPrice) && numPrice > 0) ? numPrice.toFixed(2) : '4.00';
+
+          window.paypal.Buttons({
+            style: {
+              layout: 'vertical',
+              color: 'gold',
+              shape: 'rect',
+              label: 'paypal'
+            },
+            createOrder: function(data, actions) {
+              const instText = window.currentSelectedInstrument ? ` (${window.currentSelectedInstrument})` : '';
+              return actions.order.create({
+                purchase_units: [{
+                  description: `Score & Parts: ${product.title}${instText}`,
+                  amount: {
+                    currency_code: 'USD',
+                    value: cleanAmount
+                  }
+                }]
+              });
+            },
+            onApprove: function(data, actions) {
+              return actions.order.capture().then(function(details) {
+                const buyerEmail = (details.payer && details.payer.email_address) ? details.payer.email_address : 'your PayPal email';
+                handleSuccessfulPurchase({
+                  orderId: details.id,
+                  payerEmail: buyerEmail,
+                  title: product.title,
+                  instrument: window.currentSelectedInstrument || '',
+                  amount: `$${cleanAmount}`
+                });
+              });
+            },
+            onError: function(err) {
+              console.error('PayPal checkout error:', err);
+              alert('Unable to load the PayPal checkout popup. You can click "Simulate Purchase" to test the download.');
+            }
+          }).render('#paypal-button-container');
+        }
+
+        async function handleSuccessfulPurchase(details) {
+          const drawer = document.getElementById('direct-checkout-drawer');
+          const successCard = document.getElementById('direct-success-card');
+          const successEmail = document.getElementById('success-buyer-email');
+          const successTitle = document.getElementById('success-piece-title');
+          const downloadBtn = document.getElementById('instant-download-btn');
+
+          if (drawer) drawer.style.display = 'none';
+          if (successCard) {
+            successCard.style.display = 'block';
+            successCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          if (successTitle) {
+            successTitle.textContent = details.instrument ? `${details.title} (${details.instrument})` : details.title;
+          }
+          if (successEmail) {
+            successEmail.textContent = details.payerEmail || 'your email';
+          }
+
+          // Standardize Order ID to always begin with PP_
+          const rawOrderId = (details.orderId || '').trim().replace(/[/\\?%*:|"<>]/g, '');
+          const cleanOrderId = rawOrderId.startsWith('PP_')
+            ? rawOrderId
+            : ('PP_' + rawOrderId.replace(/^PP[-_]?/i, '').replace(/^DEMO[-_]?/i, ''));
+          details.orderId = cleanOrderId; // Kept consistent across Invoice Cover & sales sheet
+
+          const cleanTitle = (details.title || 'Score').trim().replace(/[/\\?%*:|"<>]/g, '');
+          const cleanInst = (details.instrument || '').trim().replace(/[/\\?%*:|"<>]/g, '');
+          const filename = cleanInst ? `${cleanTitle}_${cleanInst}_${cleanOrderId}.pdf` : `${cleanTitle}_${cleanOrderId}.pdf`;
+
+          if (downloadBtn) {
+            downloadBtn.download = filename;
+            downloadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparing Official Score with Invoice Cover...`;
+          }
+
+          if (GOOGLE_APPS_SCRIPT_URL && GOOGLE_APPS_SCRIPT_URL.startsWith('http')) {
+            try {
+              const res = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'cors',
+                redirect: 'follow',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify({
+                  action: 'verify_and_deliver',
+                  orderId: details.orderId,
+                  pieceTitle: cleanTitle,
+                  instrument: details.instrument || '',
+                  buyerEmail: details.payerEmail,
+                  amount: details.amount || '$4.00'
+                })
+              });
+              const data = await res.json();
+              if (data && data.success && data.pdfBase64) {
+                // Decode base64 to binary Uint8Array
+                const binaryString = window.atob(data.pdfBase64);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                  bytes[i] = binaryString.charCodeAt(i);
+                }
+                await deliverMergedScore(downloadBtn, bytes.buffer, filename, details);
+                return;
+              } else if (data && data.downloadUrl) {
+                const pdfRes = await fetch(data.downloadUrl);
+                const rawScoreBytes = await pdfRes.arrayBuffer();
+                await deliverMergedScore(downloadBtn, rawScoreBytes, filename, details);
+                return;
+              } else {
+                console.warn('Backend response was not successful:', data);
+                if (data && data.error) {
+                  console.warn('Vault notice:', data.error);
+                }
+                await deliverLocalFallbackScore(downloadBtn, filename, cleanTitle, details);
+                return;
+              }
+            } catch (err) {
+              console.warn('Backend retrieval notice, building unified score locally:', err);
+              await deliverLocalFallbackScore(downloadBtn, filename, cleanTitle, details);
+              return;
+            }
+          } else {
+            await deliverLocalFallbackScore(downloadBtn, filename, cleanTitle, details);
+          }
+        }
+
+        async function deliverLocalFallbackScore(btn, filename, title, details) {
+          const sampleBytes = createSimpleTestPdf(title, details.instrument);
+          await deliverMergedScore(btn, sampleBytes, filename, details);
+        }
+
+        async function deliverMergedScore(btn, rawScoreBytes, filename, details) {
+          if (!btn) return;
+          const mergedPdfBytes = await generateInvoiceCoverAndMerge(rawScoreBytes, details);
+          const blob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+          const blobUrl = URL.createObjectURL(blob);
+          btn.href = blobUrl;
+          btn.download = filename;
+          btn.innerHTML = `<i class="fa-solid fa-file-arrow-down"></i> Download Score & Parts (${filename})`;
+          // Auto-trigger the download
+          btn.click();
+        }
+
+        async function generateInvoiceCoverAndMerge(rawScoreBytes, details) {
+          if (!window.PDFLib) {
+            console.warn('PDFLib not available, delivering raw score.');
+            return rawScoreBytes;
+          }
+
+          try {
+            const { PDFDocument, rgb, StandardFonts, PageSizes } = window.PDFLib;
+            const invoiceDoc = await PDFDocument.create();
+            const page = invoiceDoc.addPage(PageSizes.Letter);
+            const fontBold = await invoiceDoc.embedFont(StandardFonts.HelveticaBold);
+            const fontRegular = await invoiceDoc.embedFont(StandardFonts.Helvetica);
+            const fontOblique = await invoiceDoc.embedFont(StandardFonts.HelveticaOblique);
+
+            // Fetch and embed store logo if available
+            try {
+              const logoRes = await fetch('pp_files/PP_Logo_Original.png');
+              if (logoRes.ok) {
+                const logoBuffer = await logoRes.arrayBuffer();
+                const logoImage = await invoiceDoc.embedPng(logoBuffer);
+                const logoDims = logoImage.scale(0.013);
+                page.drawImage(logoImage, {
+                  x: (612 - logoDims.width) / 2,
+                  y: 675,
+                  width: logoDims.width,
+                  height: logoDims.height
+                });
+              }
+            } catch (e) {
+              console.warn('Logo embed skipped:', e);
+            }
+
+            // Background warm parchment
+            page.drawRectangle({
+              x: 0,
+              y: 0,
+              width: 612,
+              height: 792,
+              color: rgb(0.985, 0.978, 0.965)
+            });
+
+            // Outer decorative border (#4d352d)
+            page.drawRectangle({
+              x: 28,
+              y: 28,
+              width: 612 - 56,
+              height: 792 - 56,
+              borderColor: rgb(0.30, 0.21, 0.18),
+              borderWidth: 1.5
+            });
+
+            // Inner gold border (#b07d38)
+            page.drawRectangle({
+              x: 33,
+              y: 33,
+              width: 612 - 66,
+              height: 792 - 66,
+              borderColor: rgb(0.69, 0.49, 0.22),
+              borderWidth: 0.75
+            });
+
+            // Heading
+            const headerText = "PARAKEET PRESS";
+            const headerWidth = fontBold.widthOfTextAtSize(headerText, 22);
+            page.drawText(headerText, {
+              x: (612 - headerWidth) / 2,
+              y: 642,
+              size: 22,
+              font: fontBold,
+              color: rgb(0.30, 0.21, 0.18)
+            });
+
+            const subheaderText = "OFFICIAL DIGITAL SCORE EDITION & LICENSE CERTIFICATE";
+            const subheaderWidth = fontRegular.widthOfTextAtSize(subheaderText, 8.5);
+            page.drawText(subheaderText, {
+              x: (612 - subheaderWidth) / 2,
+              y: 624,
+              size: 8.5,
+              font: fontRegular,
+              color: rgb(0.42, 0.31, 0.26)
+            });
+
+            // Divider Line
+            page.drawRectangle({
+              x: 50,
+              y: 610,
+              width: 512,
+              height: 1,
+              color: rgb(0.69, 0.49, 0.22)
+            });
+
+            function drawCard(yTop, height, title) {
+              page.drawRectangle({
+                x: 50,
+                y: yTop - height,
+                width: 512,
+                height: height,
+                color: rgb(0.965, 0.945, 0.915),
+                borderColor: rgb(0.80, 0.72, 0.64),
+                borderWidth: 0.8
+              });
+              // Banner header
+              page.drawRectangle({
+                x: 50,
+                y: yTop - 22,
+                width: 512,
+                height: 22,
+                color: rgb(0.30, 0.21, 0.18)
+              });
+              page.drawText(title, {
+                x: 65,
+                y: yTop - 15,
+                size: 9.5,
+                font: fontBold,
+                color: rgb(1, 1, 1)
+              });
+            }
+
+            // Section 1: Work Details
+            drawCard(588, 118, "1. COMPOSITION & EDITION DETAILS");
+            let curY = 544;
+            const drawRow = (label, val) => {
+              page.drawText(label, { x: 65, y: curY, size: 9.5, font: fontBold, color: rgb(0.30, 0.21, 0.18) });
+              page.drawText(val, { x: 185, y: curY, size: 9.5, font: fontRegular, color: rgb(0.18, 0.12, 0.10) });
+              curY -= 19;
+            };
+
+            const instLabel = details.instrument ? `${details.instrument} (Full Score & Parts)` : 'Full Score and Parts';
+            drawRow("Title:", details.title || 'Untitled');
+            drawRow("Instrumentation:", instLabel);
+            drawRow("Composer:", "Daniel Kim");
+            drawRow("Publisher:", "Parakeet Press (parakeetpress.com)");
+
+            // Section 2: Purchase & Invoice
+            drawCard(448, 138, "2. PROOF OF PURCHASE & INVOICE RECORD");
+            curY = 405;
+            const issueDate = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+            drawRow("Order Reference:", details.orderId || 'PP-DIRECT-ORDER');
+            drawRow("Date of Purchase:", issueDate);
+            drawRow("Licensed Purchaser:", details.payerEmail || 'Authorized Customer');
+            drawRow("Payment Method:", "PayPal / Venmo (Authorized Direct Checkout)");
+            drawRow("Price Paid:", `${details.amount || '$4.00'} USD (Paid in Full — Thank You!)`);
+
+            // Section 3: Legal Terms
+            drawCard(288, 125, "3. AUTHORIZED PERFORMANCE & STUDY LICENSE");
+            const licenseTerms = [
+              "This authorized digital score is licensed exclusively to the named purchaser above.",
+              "The licensee is granted non-exclusive, perpetual rights for personal practice, study, rehearsal,",
+              "and live public concert performance.",
+              "All copyright and moral rights remain strictly reserved by Daniel Kim and Parakeet Press.",
+              "Unauthorized resale, public internet file-sharing (e.g. Scribd, IMSLP, Discord), or commercial",
+              "redistribution of this document is strictly prohibited by law."
+            ];
+            let termY = 248;
+            licenseTerms.forEach(t => {
+              page.drawText(t, { x: 65, y: termY, size: 8.5, font: fontRegular, color: rgb(0.25, 0.18, 0.15) });
+              termY -= 14;
+            });
+
+            // Footer Note
+            page.drawRectangle({
+              x: 50,
+              y: 135,
+              width: 512,
+              height: 0.8,
+              color: rgb(0.69, 0.49, 0.22)
+            });
+
+            const supportText = "Need custom transpositions, engraving adjustments, or parts? Contact Daniel Kim: dankimcomposer@gmail.com";
+            const supWidth = fontOblique.widthOfTextAtSize(supportText, 8.5);
+            page.drawText(supportText, {
+              x: (612 - supWidth) / 2,
+              y: 118,
+              size: 8.5,
+              font: fontOblique,
+              color: rgb(0.42, 0.31, 0.26)
+            });
+
+            const nextNotice = "— Official Music Score & Instrumental Parts Follow on Page 2 —";
+            const nextWidth = fontBold.widthOfTextAtSize(nextNotice, 9.5);
+            page.drawText(nextNotice, {
+              x: (612 - nextWidth) / 2,
+              y: 88,
+              size: 9.5,
+              font: fontBold,
+              color: rgb(0.30, 0.21, 0.18)
+            });
+
+            const footerText = "Parakeet Press • Fine Classical & Contemporary Music Publishing • parakeetpress.com";
+            const footWidth = fontRegular.widthOfTextAtSize(footerText, 7.5);
+            page.drawText(footerText, {
+              x: (612 - footWidth) / 2,
+              y: 44,
+              size: 7.5,
+              font: fontRegular,
+              color: rgb(0.55, 0.45, 0.38)
+            });
+
+            // Merge Score pages right after Invoice Cover Page
+            if (rawScoreBytes) {
+              const loadedScore = await PDFDocument.load(rawScoreBytes);
+              const copiedPages = await invoiceDoc.copyPages(loadedScore, loadedScore.getPageIndices());
+              copiedPages.forEach(p => invoiceDoc.addPage(p));
+            }
+
+            return await invoiceDoc.save();
+          } catch (err) {
+            console.error('Invoice cover page generation failed:', err);
+            return rawScoreBytes;
+          }
+        }
+
+        function createSimpleTestPdf(title, instrument) {
+          const instText = instrument ? `Edition: ${instrument} & Piano` : 'Full Score and Parts';
+          const content = `BT /F1 22 Tf 72 720 Td (PARAKEET PRESS) Tj /F1 16 Tf 0 -36 Td (${title}) Tj /F1 13 Tf 0 -24 Td (${instText}) Tj /F1 11 Tf 0 -30 Td (Music by Daniel Kim) Tj 0 -20 Td (Purchased via Parakeet Press Direct Store) Tj 0 -40 Td (Verification Test PDF - All systems operational.) Tj ET`;
+          const streamLength = content.length;
+          const pdfString = `%PDF-1.4\n1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n5 0 obj\n<< /Length ${streamLength} >>\nstream\n${content}\nendstream\nendobj\nxref\n0 6\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000244 00000 n \n0000000318 00000 n \ntrailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${380 + streamLength}\n%%EOF`;
+          const encoder = new TextEncoder();
+          return encoder.encode(pdfString);
+        }
 
         try {
           const pageParam = getPage();
@@ -420,7 +1557,8 @@
           }
         } catch (e) {}
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('Error loading score details:', err);
         showError('Unable to load score details.');
       });
   </script>

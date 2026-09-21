@@ -123,7 +123,7 @@ id,title,info,duration,instrumentation,year,buyLink,videoLink,buyMethod, price ,
 199,Gigue in G (String Quartet),,1.5,String Quartet,2026,https://www.sheetmusicplus.com/en/product/gigue-in-g-k-v-574-string-quartet-23827199.html,https://youtu.be/wftnb9QhFlg,SheetMusicPlus,$5.99 ,$4.00 ,33%,Public Domain: Vendor 50% / Composer 50%,FALSE,FALSE
 200,Battle Hymn of the Republic (Wind Ensemble),,2.5,Wind Ensemble,2026,https://www.sheetmusicplus.com/en/product/battle-hymn-of-the-republic-wind-ensemble-23916497.html,,SheetMusicPlus,$29.99 ,$20.00 ,33%,Public Domain: Vendor 50% / Composer 50%,FALSE,FALSE
 201,Amazing Grace (Wind Ensemble),,3,Wind Ensemble,2026,https://www.sheetmusicplus.com/en/product/amazing-grace-wind-ensemble-23916468.html,,SheetMusicPlus,$17.99 ,$12.00 ,33%,Public Domain: Vendor 50% / Composer 50%,FALSE,FALSE
-202,Time Flows Ever Onward,,2,Piano Duets,2026,solo-arr-catalogue.csv,,SheetMusicPlus,$5.99 ,$4.00 ,33%,Copyrighted Work: Vendor 90% / Arranger 10%,solo-arr-catalogue.csv,FALSE
+202,Time Flows Ever Onward (Duet),,2,Piano Duets,2026,solo-arr-catalogue.csv,,SheetMusicPlus,$5.99 ,$4.00 ,33%,Copyrighted Work: Vendor 90% / Arranger 10%,solo-arr-catalogue.csv,FALSE
 203,Battle Hymn of the Republic (Piano Solo),,2.5,Piano,2026,multiple-transpositions.csv,,SheetMusicPlus,$5.99 ,$4.00 ,33%,Public Domain: Vendor 50% / Composer 50%,FALSE,multiple-transpositions.csv
 204,Ode to Joy (Contemporary Piano),,3,Piano,2026,multiple-transpositions.csv,,SheetMusicPlus,$5.99 ,$4.00 ,33%,Public Domain: Vendor 50% / Composer 50%,FALSE,multiple-transpositions.csv
 205,Funeral March of a Marionette (Duet),,3,Piano Duets,2026,solo-arr-catalogue.csv,,SheetMusicPlus,$5.99 ,$4.00 ,33%,Public Domain: Vendor 50% / Composer 50%,solo-arr-catalogue.csv,FALSE
