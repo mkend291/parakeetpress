@@ -52,8 +52,9 @@
 
     // Robust CSV parser for quoted fields
     function parseCSV(text) {
-      const lines = text.trim().split('\n');
-      const headers = lines[0].split(',');
+      const cleanText = text.replace(/^\uFEFF/, '').replace(/\r/g, '');
+      const lines = cleanText.trim().split('\n');
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^\uFEFF/, ''));
       return lines.slice(1).map(line => {
         const values = [];
         let current = '';
@@ -71,7 +72,7 @@
         }
         values.push(current);
         const obj = {};
-        headers.forEach((h, i) => obj[h.trim()] = values[i] ? values[i].trim() : '');
+        headers.forEach((h, i) => obj[h] = values[i] ? values[i].trim() : '');
         return obj;
       });
     }
@@ -123,27 +124,38 @@
       const buyLink = hideIfNA(p.buyLink);
       const btnText = (p.buyMethod && p.buyMethod.trim()) ? p.buyMethod : 'Buy Score via Vendor';
 
-      const multiplePartsRaw = p.multipleParts ? p.multipleParts.trim() : '';
+      // Multiple Parts (Solo Arrangements)
+      const multiplePartsRaw = (p.multipleParts || '').trim();
+      const buyLinkRaw = (p.buyLink || '').trim();
+      const isMultiplePartsCSV = (multiplePartsRaw && multiplePartsRaw.match(/\.csv$/i) && multiplePartsRaw.toLowerCase() !== 'false') ||
+                                 (buyLinkRaw && buyLinkRaw.includes('solo-arr-catalogue.csv'));
+      const partsCsvFile = (multiplePartsRaw && multiplePartsRaw.match(/\.csv$/i)) ? multiplePartsRaw : 'solo-arr-catalogue.csv';
       let multiPartsBlock = '';
-      let isMultiplePartsCSV = multiplePartsRaw && multiplePartsRaw.match(/\.csv$/i);
 
       if (isMultiplePartsCSV) {
         multiPartsBlock = `<div id="multi-parts-block" class="multi-parts-container"><p style="color:var(--text-secondary);margin:0;">Loading instrument arrangement links...</p></div>`;
         setTimeout(() => {
-          fetch('pp_files/pp_store/solo-arr-catalogue.csv')
+          fetch(`pp_files/pp_store/${partsCsvFile}`)
             .then(res => res.text())
             .then(csvText => {
               const rows = parseCSV(csvText);
-              const row = rows.find(r => (r.Title || r.title || '').trim().toLowerCase() === title.trim().toLowerCase());
+              const cleanT = (s) => (s || '').toLowerCase().replace(/[\uFEFF]/g, '').trim();
+              const targetTitle = cleanT(title);
+              const row = rows.find(r => {
+                const rowTitle = cleanT(r.Title || r.title || Object.values(r)[0]);
+                return rowTitle === targetTitle || rowTitle === targetTitle.replace(/\s*\([^)]*\)$/, '');
+              });
               if (!row) {
-                document.getElementById('multi-parts-block').innerHTML = '<span style="color:#b33;">No instrument links found for this title.</span>';
+                document.getElementById('multi-parts-block').innerHTML = '<p style="color:var(--text-muted);margin:0;font-style:italic;">Instrumentation editions coming soon.</p>';
                 return;
               }
               let html = `<div class="multi-parts-title">Available Instrumentation Editions:</div><div class="multi-parts-grid">`;
+              let linkCount = 0;
               Object.keys(row).forEach(col => {
-                if (col.toLowerCase() === 'title') return;
-                const val = row[col];
-                if (val && val.trim().toLowerCase() !== 'n/a') {
+                if (col.toLowerCase() === 'title' || col.toLowerCase() === '\ufefftitle') return;
+                const val = (row[col] || '').trim();
+                if (val && val.toLowerCase() !== 'n/a') {
+                  linkCount++;
                   if (/^https?:\/\//.test(val)) {
                     html += `<a href="${val}" target="_blank" rel="noopener" class="instrument-pill">${col} &rarr;</a>`;
                   } else {
@@ -152,13 +164,69 @@
                 }
               });
               html += '</div>';
+              if (linkCount === 0) {
+                html = '<p style="color:var(--text-muted);margin:0;font-style:italic;">Instrumentation editions coming soon.</p>';
+              }
               document.getElementById('multi-parts-block').innerHTML = html;
             })
             .catch(() => {
               document.getElementById('multi-parts-block').innerHTML = '<span style="color:#b33;">Error loading instrument catalogue.</span>';
             });
         }, 0);
-      } else if (buyLink) {
+      }
+
+      // Multiple Transpositions
+      const multipleTransRaw = (p.multipleTranspositions || '').trim();
+      const isMultipleTransCSV = (multipleTransRaw && multipleTransRaw.match(/\.csv$/i) && multipleTransRaw.toLowerCase() !== 'false') ||
+                                 (buyLinkRaw && buyLinkRaw.includes('multiple-transpositions.csv'));
+      const transCsvFile = (multipleTransRaw && multipleTransRaw.match(/\.csv$/i)) ? multipleTransRaw : 'multiple-transpositions.csv';
+      let multiTransBlock = '';
+
+      if (isMultipleTransCSV) {
+        multiTransBlock = `<div id="multi-trans-block" class="multi-parts-container"><p style="color:var(--text-secondary);margin:0;">Loading available key editions...</p></div>`;
+        setTimeout(() => {
+          fetch(`pp_files/pp_store/${transCsvFile}`)
+            .then(res => res.text())
+            .then(csvText => {
+              const rows = parseCSV(csvText);
+              const cleanT = (s) => (s || '').toLowerCase().replace(/[\uFEFF]/g, '').trim();
+              const targetTitle = cleanT(title);
+              const row = rows.find(r => {
+                const rowTitle = cleanT(r.Title || r.title || Object.values(r)[0]);
+                return rowTitle === targetTitle || rowTitle === targetTitle.replace(/\s*\([^)]*\)$/, '');
+              });
+              if (!row) {
+                document.getElementById('multi-trans-block').innerHTML = '<p style="color:var(--text-muted);margin:0;font-style:italic;">Transposition editions coming soon.</p>';
+                return;
+              }
+              let html = `<div class="multi-parts-title">Available Key Transpositions:</div><div class="multi-parts-grid">`;
+              let linkCount = 0;
+              Object.keys(row).forEach(col => {
+                if (col.toLowerCase() === 'title' || col.toLowerCase() === '\ufefftitle') return;
+                const val = (row[col] || '').trim();
+                if (val && val.toLowerCase() !== 'n/a') {
+                  linkCount++;
+                  if (/^https?:\/\//.test(val)) {
+                    html += `<a href="${val}" target="_blank" rel="noopener" class="instrument-pill">${col} &rarr;</a>`;
+                  } else {
+                    html += `<span class="instrument-pill" style="opacity:0.5;cursor:not-allowed;">${col}</span>`;
+                  }
+                }
+              });
+              html += '</div>';
+              if (linkCount === 0) {
+                html = '<p style="color:var(--text-muted);margin:0;font-style:italic;">Transposition editions coming soon.</p>';
+              }
+              document.getElementById('multi-trans-block').innerHTML = html;
+            })
+            .catch(() => {
+              document.getElementById('multi-trans-block').innerHTML = '<span style="color:#b33;">Error loading transposition catalogue.</span>';
+            });
+        }, 0);
+      }
+
+      // Vendor Buy Button (only when an actual external URL exists)
+      if (buyLink && /^https?:\/\//i.test(buyLink)) {
         buyBtn += ` <a class="buy-btn" href="${buyLink}" target="_blank" rel="noopener">${btnText}</a>`;
       }
 
@@ -199,6 +267,7 @@
           </div>
 
           ${multiPartsBlock}
+          ${multiTransBlock}
 
           <div class="detail-actions">
             ${buyBtn}
