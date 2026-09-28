@@ -4,3 +4,7 @@ ParakeetPress_Engine.gs
 *ArrangeMe*
 *Sales_Report*
 *.pdf
+node_modules/
+package*.json
+preview_*
+
