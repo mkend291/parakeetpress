@@ -1179,7 +1179,72 @@
                 }]
               });
             },
-            onApprove: function(data, actions) {
+            onApprove: async function(data, actions) {
+              const drawer = document.getElementById('direct-checkout-drawer');
+              const container = document.getElementById('paypal-button-container');
+
+              // Display verifying indicator inside checkout drawer
+              if (container) {
+                container.innerHTML = `
+                  <div style="text-align:center;padding:1.4rem 1rem;color:var(--primary-dark);">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--accent);margin-bottom:0.8rem;"></i><br>
+                    <strong style="font-size:1.05rem;">Retrieving score from vault...</strong><br>
+                    <span style="font-size:0.86rem;color:var(--text-secondary);display:inline-block;margin-top:0.4rem;">
+                      <i class="fa-solid fa-shield-halved" style="color:#2f855a;"></i> Payment is held until your score is 100% verified & ready.
+                    </span>
+                  </div>
+                `;
+              }
+
+              const rawOrderId = data.orderID;
+              const cleanOrderId = 'PP_' + rawOrderId;
+              const cleanTitle = (product.title || 'Score').trim().replace(/[/\\?%*:|"<>]/g, '');
+              const cleanInst = (window.currentSelectedInstrument || '').trim().replace(/[/\\?%*:|"<>]/g, '');
+
+              // 1. Pre-verify and retrieve the real PDF from Google Drive Vault BEFORE charging!
+              let preFetchedData = null;
+              if (GOOGLE_APPS_SCRIPT_URL && GOOGLE_APPS_SCRIPT_URL.startsWith('http')) {
+                try {
+                  const res = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    redirect: 'follow',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                      action: 'verify_and_deliver',
+                      orderId: cleanOrderId,
+                      rawOrderId: rawOrderId,
+                      pieceTitle: cleanTitle,
+                      instrument: cleanInst,
+                      buyerEmail: 'pending-capture',
+                      amount: `$${cleanAmount}`,
+                      isSimulation: false
+                    })
+                  });
+                  preFetchedData = await res.json();
+                } catch (err) {
+                  console.error('Vault pre-fetch failed:', err);
+                }
+              }
+
+              // 2. SAFETY CHECK: If vault could not deliver the real score, NEVER CAPTURE PAYMENT!
+              if (!preFetchedData || !preFetchedData.success || !preFetchedData.pdfBase64) {
+                const failReason = (preFetchedData && preFetchedData.error) ? preFetchedData.error : 'Score file not found or inaccessible in vault.';
+                if (container) {
+                  container.innerHTML = `
+                    <div style="padding:1.2rem;background:#fff5f5;border:1.5px solid #feb2b2;border-radius:8px;color:#9b2c2c;text-align:left;line-height:1.5;">
+                      <strong style="font-size:1rem;color:#742a2a;"><i class="fa-solid fa-shield-halved"></i> Payment Protected — You Were Not Charged</strong><br>
+                      Our delivery vault could not confirm the score file for "${cleanTitle}".<br>
+                      <em>Reason: ${failReason}</em><br><br>
+                      <strong>Your PayPal account or card was NOT charged.</strong><br><br>
+                      Please <a href="mailto:dankimcomposer@gmail.com?subject=Score%20Order%20Inquiry:%20${encodeURIComponent(cleanTitle)}" style="color:#22543d;font-weight:700;text-decoration:underline;">contact Daniel directly</a> to order this score.
+                    </div>
+                  `;
+                }
+                return; // STOP! No money is charged.
+              }
+
+              // 3. Score is 100% verified & in memory! NOW capture payment!
               return actions.order.capture().then(function(details) {
                 const buyerEmail = (details.payer && details.payer.email_address) ? details.payer.email_address : 'your PayPal email';
                 handleSuccessfulPurchase({
@@ -1188,7 +1253,7 @@
                   title: product.title,
                   instrument: window.currentSelectedInstrument || '',
                   amount: `$${cleanAmount}`
-                });
+                }, preFetchedData);
               });
             },
             onError: function(err) {
@@ -1198,7 +1263,7 @@
           }).render('#paypal-button-container');
         }
 
-        async function handleSuccessfulPurchase(details) {
+        async function handleSuccessfulPurchase(details, preFetchedData) {
           const drawer = document.getElementById('direct-checkout-drawer');
           const successCard = document.getElementById('direct-success-card');
           const successEmail = document.getElementById('success-buyer-email');
@@ -1219,9 +1284,10 @@
 
           // Standardize Order ID to always begin with PP_
           const rawOrderId = (details.orderId || '').trim().replace(/[/\\?%*:|"<>]/g, '');
+          const rawPayPalId = rawOrderId.replace(/^PP[-_]?/i, '').replace(/^DEMO[-_]?/i, '');
           const cleanOrderId = rawOrderId.startsWith('PP_')
             ? rawOrderId
-            : ('PP_' + rawOrderId.replace(/^PP[-_]?/i, '').replace(/^DEMO[-_]?/i, ''));
+            : ('PP_' + rawPayPalId);
           details.orderId = cleanOrderId; // Kept consistent across Invoice Cover & sales sheet
           const successOrderId = document.getElementById('success-order-id');
           if (successOrderId) successOrderId.textContent = cleanOrderId;
@@ -1235,6 +1301,18 @@
             downloadBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Preparing Official Score with Invoice Cover...`;
           }
 
+          // Instant delivery if PDF was already verified & fetched in onApprove
+          if (preFetchedData && preFetchedData.success && preFetchedData.pdfBase64) {
+            const binaryString = window.atob(preFetchedData.pdfBase64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+              bytes[i] = binaryString.charCodeAt(i);
+            }
+            await deliverMergedScore(downloadBtn, bytes.buffer, filename, details);
+            return;
+          }
+
           if (GOOGLE_APPS_SCRIPT_URL && GOOGLE_APPS_SCRIPT_URL.startsWith('http')) {
             try {
               const res = await fetch(GOOGLE_APPS_SCRIPT_URL, {
@@ -1245,6 +1323,7 @@
                 body: JSON.stringify({
                   action: 'verify_and_deliver',
                   orderId: details.orderId,
+                  rawOrderId: rawPayPalId,
                   pieceTitle: cleanTitle,
                   instrument: details.instrument || '',
                   buyerEmail: details.payerEmail,
@@ -1270,19 +1349,63 @@
                 return;
               } else {
                 console.warn('Backend response was not successful:', data);
-                if (data && data.error) {
-                  console.warn('Vault notice:', data.error);
+                const errMsg = (data && data.error) ? data.error : 'Delivery vault reported a delay.';
+                if (details.isSimulation) {
+                  await deliverLocalFallbackScore(downloadBtn, filename, cleanTitle, details);
+                  return;
                 }
-                await deliverLocalFallbackScore(downloadBtn, filename, cleanTitle, details);
+                showDeliveryError(downloadBtn, filename, details, errMsg);
                 return;
               }
             } catch (err) {
-              console.warn('Backend retrieval notice, building unified score locally:', err);
-              await deliverLocalFallbackScore(downloadBtn, filename, cleanTitle, details);
+              console.warn('Backend retrieval notice:', err);
+              if (details.isSimulation) {
+                await deliverLocalFallbackScore(downloadBtn, filename, cleanTitle, details);
+                return;
+              }
+              showDeliveryError(downloadBtn, filename, details, 'Network connection interrupted while retrieving score.');
               return;
             }
           } else {
-            await deliverLocalFallbackScore(downloadBtn, filename, cleanTitle, details);
+            if (details.isSimulation) {
+              await deliverLocalFallbackScore(downloadBtn, filename, cleanTitle, details);
+            } else {
+              showDeliveryError(downloadBtn, filename, details, 'Google Apps Script delivery engine endpoint not configured.');
+            }
+          }
+        }
+
+        function showDeliveryError(btn, filename, details, reason) {
+          if (!btn) return;
+          btn.innerHTML = `<i class="fa-solid fa-rotate-right"></i> Retry Score Retrieval`;
+          btn.onclick = function(e) {
+            e.preventDefault();
+            btn.onclick = null;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Retrying score retrieval...`;
+            handleSuccessfulPurchase(details);
+          };
+          const successCard = document.getElementById('direct-success-card');
+          let errNote = document.getElementById('delivery-error-note');
+          if (!errNote && successCard) {
+            errNote = document.createElement('div');
+            errNote.id = 'delivery-error-note';
+            errNote.style.cssText = 'margin:1rem 0;padding:1rem 1.2rem;background:#fff5f5;border:1.5px solid #feb2b2;border-radius:8px;color:#9b2c2c;font-size:0.92rem;line-height:1.6;text-align:left;';
+            btn.parentElement.parentNode.insertBefore(errNote, btn.parentElement.nextSibling);
+          }
+          if (errNote) {
+            errNote.innerHTML = `
+              <div style="font-weight:700;font-size:1rem;margin-bottom:0.4rem;color:#742a2a;">
+                <i class="fa-solid fa-triangle-exclamation"></i> Score Retrieval Notice
+              </div>
+              Your PayPal payment was received and recorded (Order ID: <code>${details.orderId}</code>).<br>
+              However, our automated delivery vault reported a temporary delay: <em>${reason}</em>.<br><br>
+              <strong>Next Steps:</strong>
+              <ul style="margin:0.4rem 0 0.8rem 1.2rem;padding:0;">
+                <li>Click <strong>"Retry Score Retrieval"</strong> above to attempt instant delivery again.</li>
+                <li>Or retrieve your score anytime on our <a href="downloads.html?order=${encodeURIComponent(details.orderId)}&email=${encodeURIComponent(details.payerEmail || '')}" style="color:#22543d;font-weight:700;text-decoration:underline;">Re-Download Portal</a>.</li>
+                <li>Daniel has been notified. You can also email him directly at <a href="mailto:dankimcomposer@gmail.com?subject=Score%20Delivery%20Help:%20${encodeURIComponent(details.title)}%20(${encodeURIComponent(details.orderId)})" style="color:#22543d;font-weight:700;text-decoration:underline;">dankimcomposer@gmail.com</a> and he will send your score & parts right to your inbox.</li>
+              </ul>
+            `;
           }
         }
 
