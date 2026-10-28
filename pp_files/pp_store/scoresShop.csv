@@ -147,3 +147,4 @@ id,title,info,duration,instrumentation,year,buyLink,videoLink,buyMethod, price ,
 223,La chevaleresque (Clarinet Quartet),,2.5,Clarinet Quartet,2026,https://www.sheetmusicplus.com/en/product/la-chevaleresque-clarinet-quartet-24020683.html,,SheetMusicPlus,$7.99 ,$5.00 ,37%,Public Domain: Vendor 50% / Composer 50%,FALSE,FALSE
 224,La tarentelle (Clarinet Quartet),,1.5,Clarinet Quartet,2026,https://www.sheetmusicplus.com/en/product/la-tarentelle-clarinet-quartet-24020685.html,,SheetMusicPlus,$7.99 ,$5.00 ,37%,Public Domain: Vendor 50% / Composer 50%,FALSE,FALSE
 225,La tarentelle (Duet),,1.5,Piano Duets,2026,solo-arr-catalogue.csv,,SheetMusicPlus,$5.99 ,$4.00 ,33%,Public Domain: Vendor 50% / Composer 50%,solo-arr-catalogue.csv,FALSE
+226,The Sorcerer's Apprentice (Duet),,3,Piano Duets,2026,solo-arr-catalogue.csv,,SheetMusicPlus,$5.99 ,$4.00 ,33%,Public Domain: Vendor 50% / Composer 50%,solo-arr-catalogue.csv,FALSE
