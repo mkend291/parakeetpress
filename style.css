@@ -798,6 +798,19 @@ section h2::after {
     box-shadow: 0 4px 12px rgba(77, 53, 45, 0.22);
 }
 
+.buy-btn .price-strikethrough {
+    text-decoration: line-through;
+    opacity: 0.72;
+    font-size: 0.88em;
+    font-weight: 400;
+    margin: 0 4px 0 2px;
+}
+
+.buy-btn .price-sale {
+    font-weight: 700;
+    color: #ffffff;
+}
+
 .secondary-btn {
     background: var(--bg-surface);
     color: var(--primary-dark);

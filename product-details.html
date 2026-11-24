@@ -349,33 +349,64 @@
       return 'Sheet Music Plus';
     }
 
-    function calculateAlgorithmicDirectPrice(p) {
+    function isHolidaySaleActive(now = new Date()) {
+      const year = now.getFullYear();
+      const currentMs = new Date(year, now.getMonth(), now.getDate()).getTime();
+
+      // 1. Thanksgiving week: Sunday before Thanksgiving through Tuesday after Cyber Monday
+      const nov1Day = new Date(year, 10, 1).getDay(); // 0 = Sun, 4 = Thu
+      const firstThursday = 1 + ((4 - nov1Day + 7) % 7);
+      const fourthThursday = firstThursday + 21;
+      const tStart = new Date(year, 10, fourthThursday - 4).getTime();
+      const tEnd = new Date(year, 10, fourthThursday + 5, 23, 59, 59, 999).getTime();
+
+      if (currentMs >= tStart && currentMs <= tEnd) return true;
+
+      // 2. Christmas through New Year's: Dec 20 through Jan 3
+      const xStart = new Date(year, 11, 20).getTime();
+      const xEnd = new Date(year + 1, 0, 3, 23, 59, 59, 999).getTime();
+      if (currentMs >= xStart && currentMs <= xEnd) return true;
+
+      const prevXStart = new Date(year - 1, 11, 20).getTime();
+      const prevXEnd = new Date(year, 0, 3, 23, 59, 59, 999).getTime();
+      if (currentMs >= prevXStart && currentMs <= prevXEnd) return true;
+
+      return false;
+    }
+
+    function calculateAlgorithmicDirectPrice(p, now = new Date()) {
       const rawVendor = parseFloat(((p && p.price) || '').replace(/[^\d.]/g, ''));
       if (!isFinite(rawVendor) || rawVendor <= 0) return '$4.00';
 
       const isCopyright = ((p && p.priceNotes) || '').toLowerCase().includes('copyright');
       const smpRate = isCopyright ? 0.10 : 0.50;
       const smpNet = rawVendor * smpRate;
-      
-      // Target profit bonus: at least $0.50 (for < $10 items) or $1.00 (for >= $10 items) more than SMP
-      const targetBonus = rawVendor < 10.0 ? 0.50 : 1.00;
-      
-      // Breakeven price after PayPal standard merchant fee (3.49% + $0.49)
-      const minPriceNeeded = (smpNet + targetBonus + 0.49) / 0.9651;
-      
-      // Target an attractive 30% to 35% discount for the buyer
-      const targetDiscountPrice = rawVendor * (isCopyright ? 0.60 : 0.67);
-      
-      // Take the higher of minimum profitability or discount target, snap to whole dollar
-      let calculatedWholeDollar = Math.max(Math.ceil(minPriceNeeded), Math.round(targetDiscountPrice));
-      
-      // Ensure the buyer always receives a discount vs vendor price
-      if (calculatedWholeDollar >= rawVendor) {
-        calculatedWholeDollar = Math.floor(rawVendor);
-      }
-      if (calculatedWholeDollar < 1) calculatedWholeDollar = 1;
+      const isHoliday = isHolidaySaleActive(now);
 
-      return `$${calculatedWholeDollar}.00`;
+      let roundedPrice;
+      if (isHoliday) {
+        // Holiday week sales: deeper discount (~40-42% off PD, ~48-50% off copyright)
+        // Prefer rounding down to nearest 0.50 (e.g. $5.99 -> $3.50)
+        const targetDiscountPrice = rawVendor * (isCopyright ? 0.52 : 0.60);
+        const candidate = Math.floor(targetDiscountPrice * 2) / 2.0;
+        const minAllowed = (smpNet - 0.15 + 0.49) / 0.9651;
+        roundedPrice = Math.max(candidate, Math.floor(minAllowed * 2) / 2.0);
+      } else {
+        // Standard period: ~33-35% discount, round to nearest 0.50
+        const targetBonus = rawVendor < 10.0 ? 0.50 : 1.00;
+        const minPriceNeeded = (smpNet + targetBonus + 0.49) / 0.9651;
+        const targetDiscountPrice = rawVendor * (isCopyright ? 0.60 : 0.67);
+        const candidate = Math.max(minPriceNeeded, targetDiscountPrice);
+        roundedPrice = Math.round(candidate * 2) / 2.0;
+      }
+
+      // Ensure the buyer always receives a discount vs vendor price
+      if (roundedPrice >= rawVendor) {
+        roundedPrice = Math.floor((rawVendor - 0.5) * 2) / 2.0;
+      }
+      if (roundedPrice < 1.50) roundedPrice = 1.50;
+
+      return `$${roundedPrice.toFixed(2)}`;
     }
 
     // Robust CSV parser for quoted fields
@@ -779,7 +810,7 @@
             ${info ? `<p style="margin-top:0.4rem;line-height:1.7;"><strong>Description:</strong> ${info}</p>` : ''}
             ${price ? `<p><strong>Publisher / Vendor Price:</strong> ${price}</p>` : ''}
             ${directPrice ? `
-              <p><strong>Direct Composer Price:</strong> <span style="text-decoration:line-through;color:var(--text-muted);margin-right:0.4rem;">${price}</span><span style="color:var(--primary-dark);font-weight:bold;">${directPrice}${percentOff}</span></p>
+              <p><strong>Direct Price:</strong> <span style="text-decoration:line-through;color:var(--text-muted);margin-right:0.4rem;">${price}</span><span style="color:var(--primary-dark);font-weight:bold;">${directPrice}</span>${percentOff}${isHolidaySaleActive() ? ' <span style="color:var(--accent);font-weight:600;">(holiday sale)</span>' : ''}</p>
             ` : ''}
           </div>
 
@@ -789,7 +820,12 @@
           ${purchaseActionsHtml}
 
           <div style="margin-top:1.8rem;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:1rem 1.4rem;font-size:0.95rem;color:var(--text-secondary);line-height:1.6;">
-            <strong style="color:var(--primary-dark);">Purchasing Direct from Daniel:</strong> Third-party sheet music distributors set high price minimums and take up to 90% of royalties. Ordering directly supports the composer and provides you with personalized engraving, score preparation, and custom transpositions if needed.
+            <p style="margin:0 0 0.8rem 0;">
+              <strong style="color:var(--primary-dark);">Purchasing Direct from Daniel:</strong> Third-party sheet music distributors set high price minimums and take up to 90% of royalties. Ordering directly supports the composer and provides you with personalized engraving, score preparation, and custom transpositions if needed.
+            </p>
+            <p style="margin:0;">
+              <strong style="color:var(--primary-dark);">A Note on Direct Orders:</strong> Our direct ordering system is newly launched, and I'm doing my best to get everything set up and running smoothly. If you experience any technical issues or hiccups during checkout, I sincerely apologize for the inconvenience and truly appreciate your patience and understanding. If anything goes wrong, please reach out directly at <a href="mailto:dankimcomposer@gmail.com" style="color:var(--primary-dark);font-weight:600;text-decoration:underline;">dankimcomposer@gmail.com</a> and I'll personally make sure your score is delivered right away!
+            </p>
           </div>
         </div>
 
